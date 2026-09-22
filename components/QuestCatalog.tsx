@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import { GENRES, QUESTS, type GenreId, type Quest } from "@/lib/quests";
 import QuestCard from "@/components/QuestCard";
@@ -36,6 +36,26 @@ export default function QuestCatalog() {
       Math.min(visible.length, Math.max(1, Math.round(row.scrollLeft / step) + 1))
     );
   };
+
+  // Колесо мыши → горизонтальный скролл карусели (только когда она реально
+  // скроллится — на мобильных/узких вьюпортах). Без этого wheel просто крутит
+  // страницу, а карточки остаются неподвижны.
+  useEffect(() => {
+    const row = rowRef.current;
+    if (!row) return;
+    const onWheel = (e: WheelEvent) => {
+      const el = rowRef.current;
+      if (!el) return;
+      // Работаем только когда контейнер реально скроллится по горизонтали
+      if (el.scrollWidth <= el.clientWidth + 1) return;
+      // Преимущественно горизонтальный трекпад — пропускаем (не ломаем нативный UX)
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+      e.preventDefault();
+      el.scrollLeft += e.deltaY;
+    };
+    row.addEventListener("wheel", onWheel, { passive: false });
+    return () => row.removeEventListener("wheel", onWheel);
+  }, [visible.length]);
 
   return (
     <section id="quests" className="relative py-28 md:py-36" aria-label="Каталог квестов">

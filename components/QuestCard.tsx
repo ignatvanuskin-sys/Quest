@@ -80,12 +80,15 @@ export default function QuestCard({ quest, onOpen, index = 0 }: QuestCardProps) 
           aria-label={`Открыть детали квеста «${quest.title}»`}
           className="hover:bg-fg/5 focus-visible:bg-fg/5 absolute inset-0 cursor-pointer transition-colors"
         />
-        <span className="bg-bg/60 text-fg/80 pointer-events-none absolute left-4 top-4 max-w-[calc(100%-5.5rem)] border border-line px-3 py-1.5 text-[10px] uppercase leading-relaxed tracking-[0.14em] backdrop-blur-sm">
-          {quest.genreLabel}
-        </span>
-        <span className="bg-bg/60 tracking-caps text-fg/80 pointer-events-none absolute right-4 top-4 border border-line px-3 py-1 text-[10px] backdrop-blur-sm">
-          {quest.ageLimit}
-        </span>
+        {/* Бейджи жанра и возраста: flex-wrap, чтобы не перекрывались на узких карточках */}
+        <div className="pointer-events-none absolute inset-x-4 top-4 z-10 flex max-w-[calc(100%-2rem)] flex-wrap items-center gap-2">
+          <span className="bg-bg/60 text-fg/80 border border-line px-3 py-1.5 text-[10px] uppercase leading-relaxed tracking-[0.14em] backdrop-blur-sm">
+            {quest.genreLabel}
+          </span>
+          <span className="bg-bg/60 tracking-caps text-fg/80 border border-line px-3 py-1 text-[10px] backdrop-blur-sm">
+            {quest.ageLimit}
+          </span>
+        </div>
         <span className="border-accent-bright/50 bg-bg/60 pointer-events-none absolute bottom-4 left-4 border px-3 py-1 text-[11px] tracking-wide text-accent-bright backdrop-blur-sm">
           от {quest.priceFrom.toLocaleString("ru-RU")} ₽
         </span>
