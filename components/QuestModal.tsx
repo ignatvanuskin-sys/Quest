@@ -7,7 +7,12 @@ import type { Quest } from "@/lib/quests";
 import QuestArt from "@/components/QuestArt";
 import QuestDetailsBody from "@/components/QuestDetailsBody";
 import { useFocusTrap } from "@/lib/useFocusTrap";
-import { openBookingMenu, preselectQuest } from "@/lib/scroll";
+import {
+  openBookingMenu,
+  preselectQuest,
+  LENIS_STOP_EVENT,
+  LENIS_START_EVENT,
+} from "@/lib/scroll";
 
 interface QuestModalProps {
   quest: Quest;
@@ -39,6 +44,9 @@ export default function QuestModal({ quest, onClose }: QuestModalProps) {
     };
     window.addEventListener("keydown", onKey);
     document.documentElement.style.overflow = "hidden";
+    // Останавливаем Lenis, иначе колесо мыши (smoothWheel) перехватывает
+    // скролл и крутит страницу под модалкой, а не содержимое диалога.
+    window.dispatchEvent(new Event(LENIS_STOP_EVENT));
     // Небольшая задержка чтобы фокус сработал после mount-анимации
     const focusTimer = window.setTimeout(() => {
       closeRef.current?.focus();
@@ -47,6 +55,7 @@ export default function QuestModal({ quest, onClose }: QuestModalProps) {
     return () => {
       window.removeEventListener("keydown", onKey);
       document.documentElement.style.overflow = "";
+      window.dispatchEvent(new Event(LENIS_START_EVENT));
       window.clearTimeout(focusTimer);
       // Восстанавливаем фокус на триггер
       triggerRef.current?.focus();
