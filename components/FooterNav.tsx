@@ -2,9 +2,12 @@
 
 import Link from "next/link";
 import { scrollToId } from "@/lib/scroll";
+import { SOCIAL_LINKS } from "@/lib/contacts";
 
 /**
  * Навигация в футере — клиентский компонент для Lenis-скролла.
+ * Соцсети берутся из lib/contacts.ts, чтобы ссылки не разъезжались
+ * с блоком «Контакты» и со структурированными данными.
  */
 export default function FooterNav() {
   return (
@@ -27,36 +30,18 @@ export default function FooterNav() {
             Политика ПД
           </Link>
         </li>
-        <li>
-          <a
-            href="https://t.me/nox_quests"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex min-h-[44px] items-center transition-colors hover:text-fg"
-          >
-            Telegram
-          </a>
-        </li>
-        <li>
-          <a
-            href="https://wa.me/70000000000"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex min-h-[44px] items-center transition-colors hover:text-fg"
-          >
-            WhatsApp
-          </a>
-        </li>
-        <li>
-          <a
-            href="https://instagram.com/nox.quests"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex min-h-[44px] items-center transition-colors hover:text-fg"
-          >
-            Instagram
-          </a>
-        </li>
+        {SOCIAL_LINKS.map((s) => (
+          <li key={s.label}>
+            <a
+              href={s.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex min-h-[44px] items-center transition-colors hover:text-fg"
+            >
+              {s.label}
+            </a>
+          </li>
+        ))}
       </ul>
     </nav>
   );

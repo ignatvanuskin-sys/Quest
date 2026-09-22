@@ -65,7 +65,9 @@ export default function Hero() {
       gsap.registerPlugin(stModule.ScrollTrigger);
 
       ctx = gsap.context(() => {
-        // Посимвольный reveal заголовка: fade + blur-in
+        // Посимвольный reveal заголовка: fade + blur-in.
+        // Тайминги сжаты под короткое интро (см. BootLoader): раньше
+        // последовательность тянулась ~2.4с и первый экран казался вялым.
         const chars = titleRef.current?.querySelectorAll<HTMLElement>("[data-char]");
         if (chars?.length) {
           gsap.fromTo(
@@ -75,10 +77,10 @@ export default function Hero() {
               opacity: 1,
               yPercent: 0,
               filter: "blur(0px)",
-              duration: 1.6,
-              stagger: 0.14,
+              duration: 1.1,
+              stagger: 0.1,
               ease: "power3.out",
-              delay: 0.35,
+              delay: 0.1,
             }
           );
         }
@@ -89,10 +91,10 @@ export default function Hero() {
             {
               opacity: 1,
               y: 0,
-              duration: 1.1,
-              stagger: 0.12,
+              duration: 0.8,
+              stagger: 0.08,
               ease: "power2.out",
-              delay: 1.15,
+              delay: 0.5,
             }
           );
         }

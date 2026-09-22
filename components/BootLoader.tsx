@@ -5,19 +5,25 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
 const TITLE = "NOX";
 
-/** Длительность интро, мс */
-const MIN_SHOW = 2000;
-const MAX_SHOW = 3400;
-const REPEAT_SHOW = 900;
+/**
+ * Длительность интро, мс.
+ * Было 2000 / 3400 / 900 — интро задерживало первый экран до 3.4 секунды
+ * и всё это время блокировало скролл. Теперь это короткая «вспышка» на
+ * входе: бренд успевает прочитаться, но страница не ощущается медленной.
+ */
+const MIN_SHOW = 900;
+const MAX_SHOW = 1600;
+const REPEAT_SHOW = 450;
 
 /**
- * Стартовый экран загрузки в стилистике NOX: тьма, мерцающее название,
- * кровавая полоса прогресса, слоган — затем плавное растворение.
+ * Стартовый экран в стилистике NOX: тьма, мерцающее название,
+ * кровавая полоса прогресса, слоган — затем быстрое растворение.
  *
  * Техника: оверлей поверх SSR-контента (SEO и первый paint не страдают),
- * сайт под ним грузится, уходит по готовности страницы + минимальной паузе.
- * При prefers-reduced-motion — почти мгновенно. При повторной навигации
- * в рамках сессии — короткий вариант (900 мс).
+ * уходит по готовности страницы + минимальной паузе, но не дольше MAX_SHOW.
+ * Скролл НЕ блокируется — оверлей уходит раньше, чем пользователь успевает
+ * попытаться листать. При prefers-reduced-motion — почти мгновенно,
+ * при повторной загрузке в рамках сессии — короткий вариант.
  */
 export default function BootLoader() {
   const [visible, setVisible] = useState(true);
@@ -28,37 +34,32 @@ export default function BootLoader() {
     const minShow = seen ? REPEAT_SHOW : MIN_SHOW;
     if (seen == null) window.sessionStorage.setItem("nox:booted", "1");
 
-    // Блокируем скролл пока идёт интро
-    document.documentElement.style.overflow = "hidden";
-
     let done = false;
+    let maxTimer = 0;
     const finish = () => {
       if (done) return;
       done = true;
       window.clearTimeout(maxTimer);
-      document.documentElement.style.overflow = "";
       setVisible(false);
     };
 
     const started = Date.now();
-    const maxTimer = window.setTimeout(finish, MAX_SHOW);
+    maxTimer = window.setTimeout(finish, MAX_SHOW);
 
     if (reduced) {
-      window.setTimeout(finish, 250);
+      window.setTimeout(finish, 200);
     } else if (document.readyState === "complete") {
       window.setTimeout(finish, minShow);
     } else {
       const onLoad = () => {
         const elapsed = Date.now() - started;
-        const wait = Math.max(0, minShow - elapsed);
-        window.setTimeout(finish, wait);
+        window.setTimeout(finish, Math.max(0, minShow - elapsed));
       };
       window.addEventListener("load", onLoad, { once: true });
     }
 
     return () => {
       window.clearTimeout(maxTimer);
-      document.documentElement.style.overflow = "";
     };
   }, [reduced]);
 
@@ -70,8 +71,8 @@ export default function BootLoader() {
           role="status"
           aria-label="Загрузка NOX"
           className="fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden bg-bg"
-          exit={{ opacity: 0, scale: 1.04, filter: "blur(6px)" }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          exit={{ opacity: 0, scale: 1.03, filter: "blur(5px)" }}
+          transition={{ duration: reduced ? 0.15 : 0.45, ease: [0.22, 1, 0.36, 1] }}
         >
           {/* Тлеющий туман по краям */}
           <div
@@ -83,35 +84,38 @@ export default function BootLoader() {
             }}
           />
 
-          {/* Название — пословное проявление сквозь тьму */}
-          <div className="relative flex flex-col items-center px-6 text-center">
-            <h1
+          {/* Визуал декоративный: для скринридера достаточно aria-label оверлея.
+              Раньше здесь был <h1> — на странице получалось два h1 (второй в Hero). */}
+          <div
+            className="relative flex flex-col items-center px-6 text-center"
+            aria-hidden="true"
+          >
+            <div
               className="flicker-soft font-display font-semibold leading-none text-fg"
               style={{ fontSize: "clamp(4.5rem, 20vw, 11rem)" }}
-              aria-label="NOX"
             >
               {TITLE.split("").map((ch, i) => (
                 <motion.span
                   key={i}
                   className="inline-block will-change-transform"
-                  initial={{ opacity: 0, y: 30, filter: "blur(12px)" }}
+                  initial={{ opacity: 0, y: 24, filter: "blur(12px)" }}
                   animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                   transition={{
-                    duration: 1.1,
-                    delay: reduced ? 0 : 0.25 + i * 0.18,
+                    duration: reduced ? 0.2 : 0.7,
+                    delay: reduced ? 0 : 0.06 + i * 0.09,
                     ease: [0.22, 1, 0.36, 1],
                   }}
                 >
                   {ch}
                 </motion.span>
               ))}
-            </h1>
+            </div>
 
             <motion.p
               className="tracking-caps mt-5 text-[11px] text-fg/70 md:text-xs"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.9, delay: reduced ? 0 : 0.9 }}
+              transition={{ duration: reduced ? 0.15 : 0.5, delay: reduced ? 0 : 0.35 }}
             >
               MEMENTO&nbsp;MORI
             </motion.p>
@@ -137,7 +141,7 @@ export default function BootLoader() {
               className="mt-4 text-[11px] leading-relaxed text-muted"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: reduced ? 0 : 1.2 }}
+              transition={{ duration: reduced ? 0.15 : 0.45, delay: reduced ? 0 : 0.5 }}
             >
               Ты готов узнать, чего боишься на самом деле?
             </motion.p>

@@ -1,10 +1,12 @@
 import FooterNav from "@/components/FooterNav";
+import { CONTACTS } from "@/lib/contacts";
 
 /**
- * Футер: логотип, копирайт, юр. информация (плейсхолдер), соцсети,
+ * Футер: логотип, копирайт, юр. информация, соцсети,
  * ссылка на правила безопасности.
  * Нижний отступ учитывает home-индикатор iPhone (safe-area), а не
  * несуществующую больше липкую кнопку брони (раньше было pb-28 = 112px пустоты).
+ * Реквизиты — из lib/contacts.ts (единый источник, заменить на данные клиента).
  */
 export default function Footer() {
   return (
@@ -25,9 +27,9 @@ export default function Footer() {
 
         <div className="text-[11px] leading-relaxed text-muted">
           <p>© {new Date().getFullYear()} NOX. Все права защищены.</p>
-          <p className="mt-1">ИП Плейсхолдер П. П. · ОГРНИП 000000000000000</p>
+          <p className="mt-1">{CONTACTS.legal}</p>
           <p className="mt-1">
-            Названия комнат и визуальные материалы — демонстрационные.
+            {CONTACTS.city} · {CONTACTS.hours}
           </p>
         </div>
       </div>

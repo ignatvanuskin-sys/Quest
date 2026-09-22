@@ -9,6 +9,7 @@ import Contacts from "@/components/Contacts";
 import Footer from "@/components/Footer";
 import { REVIEWS, REVIEWS_AVG, REVIEWS_COUNT } from "@/lib/reviews";
 import { FAQ_ITEMS } from "@/lib/faq";
+import { CONTACTS, SOCIAL_LINKS } from "@/lib/contacts";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://qwest-scary.vercel.app";
 
@@ -22,18 +23,16 @@ const jsonLd = {
   url: SITE_URL,
   image: `${SITE_URL}/media/og-image.jpg`,
   slogan: "MEMENTO MORI",
-  telephone: "+7 (000) 000-00-00",
+  telephone: CONTACTS.phoneDisplay,
+  // Точный адрес не публикуем: квест-рум выдаёт его после подтверждения брони,
+  // поэтому в разметке — только город и страна (Google допускает частичный адрес).
   address: {
     "@type": "PostalAddress",
-    streetAddress: "ул. Примерная, 13, подвальный этаж",
+    addressLocality: CONTACTS.city,
     addressCountry: "RU",
   },
   openingHours: "Mo-Su 12:00-23:00",
-  sameAs: [
-    "https://t.me/nox_quests",
-    "https://wa.me/70000000000",
-    "https://instagram.com/nox.quests",
-  ],
+  sameAs: SOCIAL_LINKS.map((s) => s.href),
 };
 
 const faqJsonLd = {
