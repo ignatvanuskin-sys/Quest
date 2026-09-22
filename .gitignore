@@ -1,0 +1,31 @@
+node_modules/
+.next/
+out/
+.env
+.env.local
+.env*.local
+*.tsbuildinfo
+next-env.d.ts
+.DS_Store
+
+# Исходники медиа: храним локально, в git не пушим
+МЕДИА КОНТЕНТ/
+
+# Временные логи сборки/сервера
+*.log
+*.err
+
+# Тесты и покрытие
+coverage/
+.vitest/
+
+# Vercel
+.vercel
+
+# Редакторы
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Агент-память WorkBuddy (не часть проекта)
+.workbuddy-ai/

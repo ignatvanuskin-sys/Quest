@@ -1,0 +1,584 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============ Дизайн-токены NOX ============ */
+:root {
+  --bg: #0a0908; /* почти чёрный, тёплый оттенок сажи */
+  --bg-alt: #121110;
+  --fg: #ece7df; /* тёплый off-white */
+  --fg-muted: #8a8580;
+  --accent: #7a0f16; /* приглушённый кровавый */
+  --accent-bright: #b3222c;
+  --line: rgba(236, 231, 223, 0.12);
+  --font-display: "Cormorant", Georgia, serif;
+  --font-body: "Manrope", system-ui, sans-serif;
+  --ease-cinematic: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html {
+  background-color: var(--bg);
+  scroll-behavior: auto; /* скроллом управляет Lenis */
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--fg);
+  background-color: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--fg);
+}
+
+/* Тонкий скроллбар в стиле сайта */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: #2a2724;
+  border-radius: 8px;
+  border: 2px solid var(--bg);
+}
+
+/* Видимые фокус-стейты (WCAG) */
+:focus-visible {
+  outline: 2px solid var(--accent-bright);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    letter-spacing: 0.01em;
+  }
+  p {
+    line-height: 1.65;
+  }
+}
+
+@layer components {
+  /* Разрядённый капс для лейблов/слоганов — как в референсе */
+  .tracking-caps {
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+  }
+
+  /* Основная кнопка */
+  .btn {
+    @apply tracking-caps inline-flex min-h-[44px] items-center justify-center gap-2 px-7 py-3 text-[13px] font-semibold transition-all duration-300 ease-cinematic;
+  }
+  .btn-primary {
+    @apply btn bg-accent text-fg hover:bg-accent-bright;
+  }
+  .btn-ghost {
+    @apply btn border border-line text-fg;
+  }
+  .btn-ghost:hover {
+    border-color: rgba(236, 231, 223, 0.4);
+    background-color: rgba(236, 231, 223, 0.05);
+  }
+
+  /* Чекбокс: явный checked-стейт с галочкой + видимый фокус (keyboard) */
+  .checkbox {
+    @apply h-4 w-4 shrink-0 cursor-pointer appearance-none border border-line bg-bg-alt transition-colors duration-200;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  .checkbox:checked {
+    @apply border-accent-bright bg-accent;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M2.5 8.5l3.5 3.5 7-8' stroke='%23ece7df' stroke-width='2'/%3E%3C/svg%3E");
+  }
+  .checkbox:focus-visible {
+    outline: 2px solid var(--accent-bright);
+    outline-offset: 2px;
+  }
+
+  /* Below-the-fold секции: браузер пропускает layout/paint вне вьюпорта.
+     Экономия на длинных страницах с тяжёлыми карточками. */
+  .below-fold {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 800px;
+  }
+
+  /* Стекающая кровь в диалоге бронирования: пульсация струек,
+     падающие капли. Чистый CSS, GPU-дешёвые transform/opacity. */
+  .blood-stream {
+    transform-box: fill-box;
+    transform-origin: 50% 0;
+    animation: blood-pulse 3.2s ease-in-out infinite;
+  }
+  @keyframes blood-pulse {
+    0%,
+    100% {
+      opacity: 0.55;
+      transform: scaleY(0.96);
+    }
+    50% {
+      opacity: 0.95;
+      transform: scaleY(1.04);
+    }
+  }
+  .blood-drop {
+    opacity: 0;
+    animation: blood-fall 2.6s ease-in infinite;
+  }
+  /* Медленное нарастание крупных капель потолка (scaleY от верхней кромки) */
+  .blood-grow {
+    transform-box: fill-box;
+    transform-origin: 50% 0;
+    animation: blood-grow 5.5s ease-in-out infinite;
+  }
+  @keyframes blood-grow {
+    0% {
+      opacity: 0.85;
+      transform: scaleY(0.35);
+    }
+    45% {
+      opacity: 1;
+      transform: scaleY(1);
+    }
+    70% {
+      opacity: 1;
+      transform: scaleY(1);
+    }
+    100% {
+      opacity: 0.85;
+      transform: scaleY(0.35);
+    }
+  }
+  @keyframes blood-fall {
+    0% {
+      opacity: 0;
+      transform: translateY(0);
+    }
+    15% {
+      opacity: 0.9;
+    }
+    80% {
+      opacity: 0.9;
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(var(--drop-dist, 12px));
+    }
+  }
+
+  /* Тусклое дыхание света на стартовом экране */
+  .candle-glow {
+    background: radial-gradient(
+      50% 38% at 50% 50%,
+      rgba(232, 163, 61, 0.06) 0%,
+      transparent 70%
+    );
+    animation: candle-breathe 3.2s ease-in-out infinite;
+  }
+  @keyframes candle-breathe {
+    0%,
+    100% {
+      opacity: 0.35;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  /* Карточка с тонкой рамкой */
+  .panel {
+    @apply border border-line bg-bg-alt;
+  }
+
+  /* Фильтр-чип */
+  .chip {
+    @apply tracking-caps inline-flex min-h-[44px] items-center border border-line px-5 text-[12px] text-muted transition-all duration-300 ease-cinematic hover:text-fg;
+  }
+  .chip:hover {
+    border-color: rgba(236, 231, 223, 0.4);
+  }
+  .chip[data-active="true"] {
+    @apply border-accent-bright bg-accent text-fg;
+  }
+}
+
+/* ============ Film grain (зерно плёнки) ============ */
+/* SVG-noise инлайном, opacity ~4%. overlay 100% вьюпорта без mix-blend-mode:
+   полноэкранный fixed-слой 200% с блендингом заставлял браузер
+   перекомпозитить весь экран на каждый кадр — главный источник лагов. */
+.grain-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 90;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain-shift 1.2s steps(4) infinite;
+}
+@keyframes grain-shift {
+  0% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(-1.5%, 1%);
+  }
+  50% {
+    transform: translate(1%, -1.5%);
+  }
+  75% {
+    transform: translate(-1%, -1%);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+/* ============ Процедурный арт (плейсхолдер вместо фото/видео) ============ */
+/* Атмосферный фон: тёплая тьма + глубина + шум. seed варьирует оттенок */
+.quest-art {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(
+      120% 90% at 50% 110%,
+      hsl(var(--art-hue, 8) 30% 7%) 0%,
+      transparent 55%
+    ),
+    radial-gradient(
+      90% 70% at var(--art-x, 70%) var(--art-y, 20%),
+      hsl(var(--art-hue, 8) 45% 12%) 0%,
+      transparent 60%
+    ),
+    linear-gradient(180deg, #0b0a09 0%, #0a0908 100%);
+}
+.quest-art::before {
+  /* луч света сквозь тьму */
+  content: "";
+  position: absolute;
+  inset: -20%;
+  background: conic-gradient(
+    from var(--art-angle, 20deg) at var(--art-x, 70%) var(--art-y, 20%),
+    transparent 0deg,
+    hsl(var(--art-hue, 8) 35% 16% / 0.55) 12deg,
+    transparent 30deg
+  );
+  filter: blur(6px);
+}
+.quest-art::after {
+  /* зерно поверх арта */
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.09;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.quest-art .fog {
+  position: absolute;
+  inset: -30%;
+  background:
+    radial-gradient(45% 35% at 30% 60%, rgba(236, 231, 223, 0.045), transparent 70%),
+    radial-gradient(40% 30% at 70% 40%, rgba(236, 231, 223, 0.035), transparent 70%);
+  filter: blur(24px);
+  animation: fog-drift 26s ease-in-out infinite alternate;
+}
+.quest-art .fog.fog--2 {
+  animation-duration: 38s;
+  animation-direction: alternate-reverse;
+  opacity: 0.7;
+}
+@keyframes fog-drift {
+  from {
+    transform: translate3d(-4%, 2%, 0) scale(1);
+  }
+  to {
+    transform: translate3d(5%, -3%, 0) scale(1.12);
+  }
+}
+
+/* Мерцающее пламя свечи (экран подтверждения) */
+.candle-flame {
+  width: 14px;
+  height: 34px;
+  border-radius: 50% 50% 45% 45%;
+  background: radial-gradient(
+    50% 60% at 50% 70%,
+    #f5e6c8 0%,
+    #e8a33d 45%,
+    #b3541e 75%,
+    transparent 100%
+  );
+  filter: blur(1.5px);
+  transform-origin: 50% 100%;
+  animation: flame-flicker 0.9s ease-in-out infinite alternate;
+  box-shadow: 0 0 60px 18px rgba(232, 163, 61, 0.22);
+}
+@keyframes flame-flicker {
+  0% {
+    transform: scaleY(1) scaleX(1) rotate(-1.5deg);
+  }
+  30% {
+    transform: scaleY(1.12) scaleX(0.94) rotate(2deg);
+  }
+  60% {
+    transform: scaleY(0.92) scaleX(1.05) rotate(-2.5deg);
+  }
+  100% {
+    transform: scaleY(1.08) scaleX(0.96) rotate(1deg);
+  }
+}
+.candle-dying .candle-flame {
+  animation: flame-die 2.4s var(--ease-cinematic) forwards;
+}
+@keyframes flame-die {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  55% {
+    opacity: 0.65;
+    transform: scaleY(0.6) scaleX(1.3);
+  }
+  80% {
+    opacity: 0.3;
+    transform: scaleY(0.25) scaleX(0.7);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.1);
+  }
+}
+
+/* Индикатор скролла — пульсирующая линия */
+.scroll-line {
+  position: relative;
+  width: 1px;
+  height: 56px;
+  background: var(--line);
+  overflow: hidden;
+}
+.scroll-line::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: -40%;
+  width: 100%;
+  height: 40%;
+  background: var(--fg);
+  animation: scroll-drop 2.2s var(--ease-cinematic) infinite;
+}
+@keyframes scroll-drop {
+  0% {
+    top: -40%;
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    top: 110%;
+    opacity: 0;
+  }
+}
+
+/* Мерцание света (заголовок hero после reveal) */
+.flicker-soft {
+  animation: flicker-soft 7s linear infinite;
+}
+@keyframes flicker-soft {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  3% {
+    opacity: 0.86;
+  }
+  5% {
+    opacity: 1;
+  }
+  42% {
+    opacity: 1;
+  }
+  44% {
+    opacity: 0.9;
+  }
+  46% {
+    opacity: 1;
+  }
+  78% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 0.93;
+  }
+  82% {
+    opacity: 1;
+  }
+}
+
+/* Горизонтальные карусели — нативный snap-скролл без видимого скроллбара */
+.snap-row {
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.snap-row::-webkit-scrollbar {
+  display: none;
+}
+.snap-row > * {
+  scroll-snap-align: start;
+}
+
+/* Кастомный курсор — прячем системный только когда кольцо активно (desktop) */
+body.has-custom-cursor,
+body.has-custom-cursor a,
+body.has-custom-cursor button {
+  cursor: none;
+}
+
+/* ============ Витрина квестов (QuestShowcase) ============ */
+/* Слайд-обложка: кроссфейд; активная — с лёгким Ken Burns зумом */
+.quest-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.9s ease;
+  pointer-events: none;
+}
+.quest-slide.is-active {
+  opacity: 1;
+  pointer-events: auto;
+}
+.quest-slide-img {
+  transform: scale(1.02);
+  transition: transform 7s ease-out;
+}
+.quest-slide.is-active .quest-slide-img {
+  transform: scale(1.1);
+}
+
+/* Полоса прогресса автопрокрутки в навигации слайдов */
+.quest-progress-fill {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: var(--accent-bright);
+  animation: quest-fill linear forwards;
+}
+[data-showcase-paused="true"] .quest-progress-fill {
+  animation-play-state: paused;
+}
+@keyframes quest-fill {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+/* ============ Пугающие красные глаза (фон диалога брони) ============ */
+.red-eyes {
+  position: absolute;
+  display: flex;
+  gap: 8px;
+  opacity: 0;
+  transform: scale(var(--eyes-scale, 1));
+  animation: red-eyes-cycle var(--eyes-dur, 7s) ease-in-out infinite;
+  animation-delay: var(--eyes-delay, 0s);
+}
+.red-eye {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background: var(--accent-bright);
+  box-shadow:
+    0 0 8px 2px rgba(179, 34, 44, 0.9),
+    0 0 18px 6px rgba(122, 15, 22, 0.45);
+  animation: red-eye-blink var(--eyes-dur, 7s) ease-in-out infinite;
+  animation-delay: var(--eyes-delay, 0s);
+}
+/* Появление, «вглядывание», растворение */
+@keyframes red-eyes-cycle {
+  0% {
+    opacity: 0;
+    transform: scale(var(--eyes-scale, 1)) translateY(5px);
+  }
+  12% {
+    opacity: 0.85;
+  }
+  50% {
+    opacity: 0.85;
+  }
+  66%,
+  100% {
+    opacity: 0;
+    transform: scale(var(--eyes-scale, 1)) translateY(-5px);
+  }
+}
+/* Редкое моргание, пока глаза видимы */
+@keyframes red-eye-blink {
+  0%,
+  18%,
+  22%,
+  40%,
+  100% {
+    transform: scaleY(1);
+  }
+  20% {
+    transform: scaleY(0.06);
+  }
+}
+
+/* ============ prefers-reduced-motion: глушим всё до статики ============ */
+/* ============ prefers-reduced-motion: глушим всё до статики ============ */
+@media (prefers-reduced-motion: reduce) {
+  .grain-overlay,
+  .quest-art .fog,
+  .candle-flame,
+  .candle-glow,
+  .scroll-line::after,
+  .flicker-soft,
+  .blood-stream,
+  .blood-drop,
+  .blood-grow,
+  .quest-progress-fill,
+  .red-eyes,
+  .red-eye {
+    animation: none !important;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
