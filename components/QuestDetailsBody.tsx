@@ -53,10 +53,12 @@ export default function QuestDetailsBody({
       {/* Сюжет */}
       <p className="text-base leading-relaxed text-fg/85">{quest.plot}</p>
 
-      {/* Галерея — свайп на мобильном */}
+      {/* Галерея — свайп на мобильном.
+          Без snap-x намеренно: снап на горизонтальном скроллере внутри
+          вертикально прокручиваемого диалога мешает прокрутке диалога. */}
       <div>
         <Heading>АТМОСФЕРА</Heading>
-        <div className="snap-row mt-3 flex snap-x gap-3 overflow-x-auto pb-2">
+        <div className="snap-row mt-3 flex gap-3 overflow-x-auto pb-2">
           {quest.gallery.map((src, i) => (
             <div
               key={`${src}-${i}`}

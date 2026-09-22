@@ -5,6 +5,7 @@ import { QUESTS, getQuestBySlug } from "@/lib/quests";
 import QuestArt from "@/components/QuestArt";
 import QuestDetailsBody from "@/components/QuestDetailsBody";
 import BookQuestButton from "@/components/BookQuestButton";
+import Reveal from "@/components/Reveal";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://qwest-scary.vercel.app";
 
@@ -93,44 +94,48 @@ export default function QuestPage({ params }: QuestPageProps) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
 
-      <Link
-        href="/#quests"
-        className="tracking-caps inline-flex min-h-[44px] items-center gap-2 text-[11px] text-muted transition-colors hover:text-fg"
-      >
-        <span aria-hidden="true">←</span> ВСЕ КВЕСТЫ
-      </Link>
+      <Reveal>
+        <Link
+          href="/#quests"
+          className="tracking-caps inline-flex min-h-[44px] items-center gap-2 text-[11px] text-muted transition-colors hover:text-fg"
+        >
+          <span aria-hidden="true">←</span> ВСЕ КВЕСТЫ
+        </Link>
+      </Reveal>
 
-      <div className="panel mt-6 overflow-hidden">
-        {/* Hero */}
-        <div className="relative h-72 overflow-hidden md:h-96">
-          <QuestArt
-            seed={quest.art.cover}
-            imageSrc={quest.cover}
-            imagePosition="50% 40%"
-            priority
-            label={`Квест «${quest.title}»`}
-            sizes="(max-width: 768px) 100vw, 768px"
-          />
-          <div
-            className="absolute inset-0"
-            aria-hidden="true"
-            style={{
-              background:
-                "linear-gradient(180deg, rgba(10,9,8,0.15) 0%, rgba(10,9,8,0.95) 100%)",
-            }}
-          />
-          <div className="absolute bottom-5 left-6 right-6 md:left-8 md:right-8">
-            <span className="tracking-caps text-[11px] text-fg/70">
-              {quest.genreLabel} · {quest.ageLimit}
-            </span>
-            <h1 className="mt-1 font-display text-4xl text-fg md:text-5xl">
-              {quest.title}
-            </h1>
+      <Reveal delay={0.08}>
+        <div className="panel mt-6 overflow-hidden">
+          {/* Hero */}
+          <div className="relative h-72 overflow-hidden md:h-96">
+            <QuestArt
+              seed={quest.art.cover}
+              imageSrc={quest.cover}
+              imagePosition="50% 40%"
+              priority
+              label={`Квест «${quest.title}»`}
+              sizes="(max-width: 768px) 100vw, 768px"
+            />
+            <div
+              className="absolute inset-0"
+              aria-hidden="true"
+              style={{
+                background:
+                  "linear-gradient(180deg, rgba(10,9,8,0.15) 0%, rgba(10,9,8,0.95) 100%)",
+              }}
+            />
+            <div className="absolute bottom-5 left-6 right-6 md:left-8 md:right-8">
+              <span className="tracking-caps text-[11px] text-fg/70">
+                {quest.genreLabel} · {quest.ageLimit}
+              </span>
+              <h1 className="mt-1 font-display text-4xl text-fg md:text-5xl">
+                {quest.title}
+              </h1>
+            </div>
           </div>
-        </div>
 
-        <QuestDetailsBody quest={quest} cta={<BookQuestButton slug={quest.slug} />} />
-      </div>
+          <QuestDetailsBody quest={quest} cta={<BookQuestButton slug={quest.slug} />} />
+        </div>
+      </Reveal>
     </main>
   );
 }

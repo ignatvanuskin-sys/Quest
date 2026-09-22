@@ -86,7 +86,7 @@ export default function BookingModal({ open, onClose }: BookingModalProps) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: reduced ? 0 : 24 }}
             transition={{ duration: reduced ? 0.2 : 0.45, ease: [0.22, 1, 0.36, 1] }}
-            className="panel relative z-10 flex w-full flex-col overflow-y-auto md:max-h-[92vh] md:max-w-xl"
+            className="panel relative z-10 flex w-full flex-col overflow-y-auto overscroll-contain md:max-h-[92vh] md:max-w-xl"
           >
             {/* Пугающие красные глаза, выглядывающие из тьмы (фон диалога) */}
             <RedEyes />

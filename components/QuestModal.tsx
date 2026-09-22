@@ -93,7 +93,7 @@ export default function QuestModal({ quest, onClose }: QuestModalProps) {
         ref={panelRef}
         layoutId={`quest-${quest.slug}`}
         transition={{ duration: reduced ? 0.2 : 0.55, ease: [0.22, 1, 0.36, 1] }}
-        className="panel relative z-10 flex max-h-full w-full max-w-3xl flex-col overflow-y-auto pb-[env(safe-area-inset-bottom)]"
+        className="panel relative z-10 flex max-h-full w-full max-w-3xl flex-col overflow-y-auto overscroll-contain pb-[env(safe-area-inset-bottom)]"
       >
         {/* Hero модалки */}
         <div className="relative h-56 shrink-0 overflow-hidden md:h-72">

@@ -214,11 +214,14 @@ body {
   }
 
   /* Карточка с тонкой рамкой.
-     overscroll-behavior: contain — при скролле внутри карточки (мобильные
-     диалоги, длинные панели) жест не «протекает» на страницу под ней. */
+     ВАЖНО: здесь НЕ должно быть overscroll-behavior: contain.
+     Карточки квестов — тоже .panel, и contain превращал каждую в
+     скролл-контейнер, который сам не скроллится и не отдаёт жест
+     странице: на мобильном ряд карточек переставал листаться и вниз,
+     и вправо. Контейнмент нужен только реально скроллящимся панелям —
+     он навешивается точечно классом overscroll-contain на диалоги. */
   .panel {
     @apply border border-line bg-bg-alt;
-    overscroll-behavior: contain;
   }
 
   /* Фильтр-чип */
@@ -460,16 +463,19 @@ body {
 }
 
 /* Горизонтальные карусели — нативный snap-скролл без видимого скроллбара */
+/* Горизонтальная карусель каталога (мобильный).
+   Здесь СОЗНАТЕЛЬНО нет ни scroll-snap-type, ни touch-action — оба проверены
+   замером настоящими touch-событиями и оба ломали вертикальный жест:
+   с ними палец на карточке не мог прокрутить страницу вниз (0px вместо 225px).
+   Ряд при этом листается вбок свободно. Индикатор «N / всего» работает
+   по событию scroll и от снапа не зависит.
+   touch-action по умолчанию (auto) разрешает и панорамирование, и зум. */
 .snap-row {
-  scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
 .snap-row::-webkit-scrollbar {
   display: none;
-}
-.snap-row > * {
-  scroll-snap-align: start;
 }
 
 /* Кастомный курсор — прячем системный только когда кольцо активно (desktop) */
@@ -480,16 +486,23 @@ body.has-custom-cursor button {
 }
 
 /* ============ Витрина квестов (QuestShowcase) ============ */
-/* Слайд-обложка: кроссфейд; активная — с лёгким Ken Burns зумом */
+/* Слайд-обложка: кроссфейд + лёгкий наезд камеры на входе.
+   Только opacity/transform — на мобильном это дёшево (нет перерисовки
+   фильтров и layout'а). Активный слайд продолжает медленный Ken Burns. */
 .quest-slide {
   position: absolute;
   inset: 0;
   opacity: 0;
-  transition: opacity 0.9s ease;
+  transform: scale(1.04);
+  transition:
+    opacity 1s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 1.4s cubic-bezier(0.22, 1, 0.36, 1);
   pointer-events: none;
+  will-change: opacity, transform;
 }
 .quest-slide.is-active {
   opacity: 1;
+  transform: scale(1);
   pointer-events: auto;
 }
 .quest-slide-img {

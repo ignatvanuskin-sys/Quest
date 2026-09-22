@@ -125,8 +125,15 @@ export default function QuestShowcase({ onOpen }: QuestShowcaseProps) {
     <div
       className="relative flex min-h-[540px] flex-col overflow-hidden border border-line bg-bg-alt md:min-h-[560px]"
       data-showcase-paused={paused ? "true" : "false"}
-      onPointerEnter={() => setPaused(true)}
-      onPointerLeave={() => setPaused(false)}
+      /* Пауза по наведению — только для мыши. На тач-устройстве pointerenter
+         срабатывает при касании, а pointerleave может не прийти (палец ушёл
+         на модалку, элемент уехал из-под пальца) — витрина замирала навсегда. */
+      onPointerEnter={(e) => {
+        if (e.pointerType === "mouse") setPaused(true);
+      }}
+      onPointerLeave={(e) => {
+        if (e.pointerType === "mouse") setPaused(false);
+      }}
       onFocusCapture={() => setPaused(true)}
       onBlurCapture={() => setPaused(false)}
       onTouchStart={onTouchStart}

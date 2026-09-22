@@ -38,10 +38,24 @@ export default function Hero() {
     if (!useVideo || !videoRef.current) return;
     const video = videoRef.current;
 
+    // iOS: React проставляет muted как свойство, но не как атрибут в разметке,
+    // а политика автоплея у Safari смотрит на элемент. Выставляем явно —
+    // без этого видео на телефоне просто не стартует и остаётся постер.
+    video.muted = true;
+    video.defaultMuted = true;
+    video.setAttribute("muted", "");
+    video.setAttribute("playsinline", "");
+
+    let gestureDone = false;
+    const tryPlay = () => {
+      const p = video.play();
+      if (p && typeof p.catch === "function") p.catch(() => {});
+    };
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          video.play().catch(() => {});
+          tryPlay();
         } else {
           video.pause();
         }
@@ -49,7 +63,24 @@ export default function Hero() {
       { threshold: 0.01 }
     );
     observer.observe(video);
-    return () => observer.disconnect();
+
+    // Если автоплей заблокирован (режим энергосбережения iOS, строгие политики),
+    // запускаем с первого же касания — пользователь всё равно взаимодействует.
+    const onFirstGesture = () => {
+      if (gestureDone) return;
+      gestureDone = true;
+      tryPlay();
+      window.removeEventListener("touchstart", onFirstGesture);
+      window.removeEventListener("click", onFirstGesture);
+    };
+    window.addEventListener("touchstart", onFirstGesture, { passive: true });
+    window.addEventListener("click", onFirstGesture);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("touchstart", onFirstGesture);
+      window.removeEventListener("click", onFirstGesture);
+    };
   }, [useVideo]);
 
   useEffect(() => {
@@ -148,9 +179,11 @@ export default function Hero() {
             muted
             loop
             playsInline
-            preload="none"
+            // metadata, а не none: с preload="none" iOS не всегда стартует play()
+            preload="metadata"
             poster="/media/hero-poster.jpg"
             aria-hidden="true"
+            onError={() => setUseVideo(false)}
           >
             <source src="/media/hero-loop.mp4" type="video/mp4" />
           </video>

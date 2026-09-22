@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Reveal from "@/components/Reveal";
 
 export const metadata: Metadata = {
   title: "Политика обработки персональных данных | NOX",
@@ -98,8 +99,8 @@ export default function PrivacyPage() {
       </p>
 
       <div className="mt-12 space-y-10">
-        {SECTIONS.map((section) => (
-          <section key={section.title}>
+        {SECTIONS.map((section, idx) => (
+          <Reveal key={section.title} as="section" delay={Math.min(idx * 0.04, 0.24)}>
             <h2 className="font-display text-2xl text-fg">{section.title}</h2>
             <div className="mt-3 space-y-3">
               {section.body.map((p, i) => (
@@ -108,14 +109,16 @@ export default function PrivacyPage() {
                 </p>
               ))}
             </div>
-          </section>
+          </Reveal>
         ))}
       </div>
 
-      <p className="mt-14 border-t border-line pt-6 text-xs leading-relaxed text-muted">
-        Актуальная редакция от 1 сентября 2026 года. По вопросам обработки персональных
-        данных обращайтесь через раздел «Контакты».
-      </p>
+      <Reveal delay={0.1}>
+        <p className="mt-14 border-t border-line pt-6 text-xs leading-relaxed text-muted">
+          Актуальная редакция от 1 сентября 2026 года. По вопросам обработки персональных
+          данных обращайтесь через раздел «Контакты».
+        </p>
+      </Reveal>
     </main>
   );
 }
