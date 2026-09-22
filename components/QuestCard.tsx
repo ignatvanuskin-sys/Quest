@@ -23,7 +23,7 @@ function Skulls({ level }: { level: number }) {
           viewBox="0 0 24 24"
           fill="currentColor"
           aria-hidden="true"
-          className={i < level ? "text-accent-bright" : "text-fg/20"}
+          className={i < level ? "text-accent-text" : "text-fg/20"}
         >
           <path d="M12 2C7.03 2 3 6.03 3 11c0 2.4.94 4.58 2.5 6.17V20a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-2.83A8.96 8.96 0 0 0 21 11c0-4.97-4.03-9-9-9zM8.5 13a1.75 1.75 0 1 1 0-3.5 1.75 1.75 0 0 1 0 3.5zm7 0a1.75 1.75 0 1 1 0-3.5 1.75 1.75 0 0 1 0 3.5zM10 16h4v3h-1v-1.5h-2V19h-1v-3z" />
         </svg>
@@ -78,18 +78,18 @@ export default function QuestCard({ quest, onOpen, index = 0 }: QuestCardProps) 
           onClick={() => onOpen(quest)}
           aria-haspopup="dialog"
           aria-label={`Открыть детали квеста «${quest.title}»`}
-          className="hover:bg-fg/5 focus-visible:bg-fg/5 absolute inset-0 cursor-pointer transition-colors"
+          className="absolute inset-0 cursor-pointer transition-colors hover:bg-fg/5 focus-visible:bg-fg/5"
         />
         {/* Бейджи жанра и возраста: flex-wrap, чтобы не перекрывались на узких карточках */}
         <div className="pointer-events-none absolute inset-x-4 top-4 z-10 flex max-w-[calc(100%-2rem)] flex-wrap items-center gap-2">
-          <span className="bg-bg/60 text-fg/80 border border-line px-3 py-1.5 text-[10px] uppercase leading-relaxed tracking-[0.14em] backdrop-blur-sm">
+          <span className="border border-line bg-bg/60 px-3 py-1.5 text-[11px] uppercase leading-relaxed tracking-[0.14em] text-fg/80 backdrop-blur-sm">
             {quest.genreLabel}
           </span>
-          <span className="bg-bg/60 tracking-caps text-fg/80 border border-line px-3 py-1 text-[10px] backdrop-blur-sm">
+          <span className="tracking-caps border border-line bg-bg/60 px-3 py-1 text-[11px] text-fg/80 backdrop-blur-sm">
             {quest.ageLimit}
           </span>
         </div>
-        <span className="border-accent-bright/50 bg-bg/60 pointer-events-none absolute bottom-4 left-4 border px-3 py-1 text-[11px] tracking-wide text-accent-bright backdrop-blur-sm">
+        <span className="pointer-events-none absolute bottom-4 left-4 border border-accent-bright/50 bg-bg/60 px-3 py-1 text-[11px] tracking-wide text-accent-text backdrop-blur-sm">
           от {quest.priceFrom.toLocaleString("ru-RU")} ₽
         </span>
       </div>
@@ -99,7 +99,7 @@ export default function QuestCard({ quest, onOpen, index = 0 }: QuestCardProps) 
         <h3 className="font-display text-2xl text-fg">{quest.title}</h3>
         <p className="text-sm leading-relaxed text-muted">{quest.teaser}</p>
 
-        <div className="text-fg/60 mt-auto flex flex-wrap items-center gap-x-4 gap-y-2 pt-2 text-[11px] tracking-wide">
+        <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-2 pt-2 text-[11px] tracking-wide text-fg/60">
           <Skulls level={quest.difficulty} />
           <span>{quest.durationMin} мин</span>
           <span>

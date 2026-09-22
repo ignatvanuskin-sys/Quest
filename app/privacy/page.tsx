@@ -78,7 +78,10 @@ const SECTIONS = [
  */
 export default function PrivacyPage() {
   return (
-    <main id="main" className="mx-auto max-w-3xl px-6 pb-28 pt-28 md:pt-36">
+    <main
+      id="main"
+      className="mx-auto max-w-3xl px-6 pb-28 pt-[calc(7rem+env(safe-area-inset-top))] md:pt-36"
+    >
       <Link
         href="/"
         className="tracking-caps inline-flex min-h-[44px] items-center gap-2 text-[11px] text-muted transition-colors hover:text-fg"
@@ -101,7 +104,7 @@ export default function PrivacyPage() {
             <h2 className="font-display text-2xl text-fg">{section.title}</h2>
             <div className="mt-3 space-y-3">
               {section.body.map((p, i) => (
-                <p key={i} className="text-fg/80 text-sm leading-relaxed">
+                <p key={i} className="text-sm leading-relaxed text-fg/80">
                   {p}
                 </p>
               ))}

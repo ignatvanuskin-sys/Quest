@@ -108,7 +108,7 @@ export default function BootLoader() {
             </h1>
 
             <motion.p
-              className="tracking-caps text-fg/70 mt-5 text-[11px] md:text-xs"
+              className="tracking-caps mt-5 text-[11px] text-fg/70 md:text-xs"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.9, delay: reduced ? 0 : 0.9 }}
@@ -134,7 +134,7 @@ export default function BootLoader() {
             </div>
 
             <motion.p
-              className="mt-4 text-[10px] leading-relaxed text-muted"
+              className="mt-4 text-[11px] leading-relaxed text-muted"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8, delay: reduced ? 0 : 1.2 }}

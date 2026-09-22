@@ -95,8 +95,8 @@ export default function DarkSelect({
             setOpen(true);
           }
         }}
-        className={`bg-bg-alt flex min-h-[46px] w-full items-center justify-between gap-3 rounded-none border px-3.5 py-2.5 text-left text-[16px] transition-colors duration-300 focus:border-fg/40 focus:outline-none md:text-[14px] ${
-          picked ? "border-line text-fg" : "text-muted/70 border-line"
+        className={`flex min-h-[46px] w-full items-center justify-between gap-3 rounded-none border bg-bg-alt px-3.5 py-2.5 text-left text-[16px] transition-colors duration-300 focus:border-fg/40 focus:outline-none md:text-[14px] ${
+          picked ? "border-line text-fg" : "border-line text-muted"
         } ${open ? "border-fg/40" : ""}`}
       >
         <span className="truncate">{picked ? picked.label : placeholder}</span>
@@ -153,7 +153,7 @@ export default function DarkSelect({
                       next?.focus();
                     }
                   }}
-                  className={`hover:bg-fg/10 focus:bg-fg/10 flex min-h-[44px] w-full cursor-pointer items-center px-3.5 py-2.5 text-left text-[14px] transition-colors focus:outline-none ${
+                  className={`flex min-h-[44px] w-full cursor-pointer items-center px-3.5 py-2.5 text-left text-[14px] transition-colors hover:bg-fg/10 focus:bg-fg/10 focus:outline-none ${
                     selected ? "bg-fg/10 text-fg" : "text-fg/85"
                   }`}
                 >

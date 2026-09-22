@@ -6,7 +6,7 @@ function Flag({ label, value }: { label: string; value: boolean }) {
   return (
     <li className="flex items-center justify-between gap-4 border-b border-line py-2 text-sm">
       <span className="text-muted">{label}</span>
-      <span className={value ? "text-accent-bright" : "text-fg/70"}>
+      <span className={value ? "text-accent-text" : "text-fg/70"}>
         {value ? "Есть" : "Нет"}
       </span>
     </li>
@@ -38,20 +38,20 @@ export default function QuestDetailsBody({
   return (
     <div className="space-y-8 p-5 md:p-8">
       {/* Мета */}
-      <div className="text-fg/70 flex flex-wrap gap-x-6 gap-y-2 text-[12px] tracking-wide">
+      <div className="flex flex-wrap gap-x-6 gap-y-2 text-[12px] tracking-wide text-fg/70">
         <span>Сложность: {quest.difficulty}/5</span>
         <span>{quest.durationMin} минут</span>
         <span>
           {quest.playersMin}–{quest.playersMax} игроков
         </span>
         <span>{quest.ageLimit}</span>
-        <span className="text-accent-bright">
+        <span className="text-accent-text">
           от {quest.priceFrom.toLocaleString("ru-RU")} ₽ за группу
         </span>
       </div>
 
       {/* Сюжет */}
-      <p className="text-fg/85 text-base leading-relaxed">{quest.plot}</p>
+      <p className="text-base leading-relaxed text-fg/85">{quest.plot}</p>
 
       {/* Галерея — свайп на мобильном */}
       <div>
@@ -77,11 +77,11 @@ export default function QuestDetailsBody({
       <div className="grid gap-6 md:grid-cols-2">
         <div>
           <Heading>АКТЁРЫ</Heading>
-          <p className="text-fg/80 mt-3 text-sm leading-relaxed">{quest.actors}</p>
+          <p className="mt-3 text-sm leading-relaxed text-fg/80">{quest.actors}</p>
         </div>
         <div>
           <Heading>ЧТО ВЗЯТЬ С СОБОЙ</Heading>
-          <ul className="text-fg/80 mt-3 space-y-2 text-sm">
+          <ul className="mt-3 space-y-2 text-sm text-fg/80">
             {quest.bring.map((item) => (
               <li key={item} className="flex gap-2">
                 <span

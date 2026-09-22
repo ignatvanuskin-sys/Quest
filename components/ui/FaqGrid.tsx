@@ -70,7 +70,7 @@ export default function FaqGrid({
                 className="absolute inset-x-0 top-0 h-px origin-left scale-x-0 bg-accent-bright transition-transform duration-500 ease-cinematic group-hover:scale-x-100"
                 aria-hidden="true"
               />
-              <h3 className="font-display text-xl leading-snug text-fg transition-colors duration-300 group-hover:text-accent-bright">
+              <h3 className="font-display text-xl leading-snug text-fg transition-colors duration-300 group-hover:text-accent-text">
                 {item.question}
               </h3>
               <p className="text-sm leading-relaxed text-muted">{item.answer}</p>

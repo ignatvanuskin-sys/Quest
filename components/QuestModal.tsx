@@ -79,7 +79,7 @@ export default function QuestModal({ quest, onClose }: QuestModalProps) {
       <motion.button
         type="button"
         aria-label="Закрыть"
-        className="bg-bg/80 absolute inset-0 h-full w-full cursor-default backdrop-blur-sm"
+        className="absolute inset-0 h-full w-full cursor-default bg-bg/80 backdrop-blur-sm"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -93,7 +93,7 @@ export default function QuestModal({ quest, onClose }: QuestModalProps) {
         ref={panelRef}
         layoutId={`quest-${quest.slug}`}
         transition={{ duration: reduced ? 0.2 : 0.55, ease: [0.22, 1, 0.36, 1] }}
-        className="panel relative z-10 flex max-h-full w-full max-w-3xl flex-col overflow-y-auto"
+        className="panel relative z-10 flex max-h-full w-full max-w-3xl flex-col overflow-y-auto pb-[env(safe-area-inset-bottom)]"
       >
         {/* Hero модалки */}
         <div className="relative h-56 shrink-0 overflow-hidden md:h-72">
@@ -117,7 +117,7 @@ export default function QuestModal({ quest, onClose }: QuestModalProps) {
             type="button"
             onClick={onClose}
             aria-label="Закрыть детали квеста"
-            className="bg-bg/60 absolute right-4 top-4 flex h-[44px] w-[44px] items-center justify-center border border-line text-fg backdrop-blur-sm transition-colors hover:border-accent-bright hover:text-accent-bright"
+            className="absolute right-4 top-[calc(1rem+env(safe-area-inset-top))] flex h-[44px] w-[44px] items-center justify-center border border-line bg-bg/60 text-fg backdrop-blur-sm transition-colors hover:border-accent-bright hover:text-accent-text"
           >
             <svg
               width="16"
@@ -130,9 +130,12 @@ export default function QuestModal({ quest, onClose }: QuestModalProps) {
             </svg>
           </button>
           <div className="absolute bottom-4 left-5 right-5">
-            <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[10px] tracking-caps text-fg/70">
+            <div className="tracking-caps flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[11px] text-fg/70">
               <span>{quest.genreLabel}</span>
-              <span className="h-1 w-1 shrink-0 rounded-full bg-fg/40" aria-hidden="true" />
+              <span
+                className="h-1 w-1 shrink-0 rounded-full bg-fg/40"
+                aria-hidden="true"
+              />
               <span>{quest.ageLimit}</span>
             </div>
             <h3 className="mt-1 font-display text-4xl text-fg">{quest.title}</h3>

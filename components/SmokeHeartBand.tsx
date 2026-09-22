@@ -55,7 +55,7 @@ export default function SmokeHeartBand() {
         aria-hidden="true"
         style={{
           background:
-            "linear-gradient(180deg, var(--bg) 0%, rgba(10,9,8,0.35) 22%, rgba(10,9,8,0.45) 62%, var(--bg) 100%)",
+            "linear-gradient(180deg, rgb(var(--bg)) 0%, rgba(10,9,8,0.35) 22%, rgba(10,9,8,0.45) 62%, rgb(var(--bg)) 100%)",
         }}
       />
       <div
@@ -69,7 +69,7 @@ export default function SmokeHeartBand() {
 
       <div className="relative z-10 px-6 text-center">
         <Reveal>
-          <p className="tracking-caps text-fg/60 text-[10px]">MEMENTO MORI</p>
+          <p className="tracking-caps text-[11px] text-fg/60">MEMENTO MORI</p>
           <p className="mx-auto mt-6 max-w-2xl font-display text-3xl leading-snug text-fg md:text-5xl">
             Страх живёт в паузе между ударами сердца.
           </p>

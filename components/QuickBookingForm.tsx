@@ -11,10 +11,10 @@ import DarkSelect from "@/components/DarkSelect";
 // Инпуты 16px на мобильных — Safari не зумит форму при фокусе (input zoom)
 // Поля в стиле карточки (bg-bg-alt), без кровавых акцентов.
 const field =
-  "min-h-[46px] w-full appearance-none rounded-none border border-line bg-bg-alt text-opacity-90 text-[16px] text-fg placeholder:text-muted/70 transition-colors duration-300 focus:border-fg/40 focus:outline-none md:text-[14px]";
+  "min-h-[46px] w-full appearance-none rounded-none border border-line bg-bg-alt text-opacity-90 text-[16px] text-fg placeholder:text-muted transition-colors duration-300 focus:border-fg/40 focus:outline-none md:text-[14px]";
 const selectField =
   "bg-bg-alt text-[16px] text-fg focus:border-fg/40 focus:outline-none md:text-[14px]";
-const selectPlaceholder = "text-muted/70 md:text-[14px]";
+const selectPlaceholder = "text-muted md:text-[14px]";
 const selectValue = "text-fg";
 
 const optionStyle =
@@ -22,7 +22,7 @@ const optionStyle =
 const selected = "text-fg bg-fg/10";
 const neutral = "text-fg/85";
 
-const label = "mb-1.5 block text-[10px] tracking-caps text-muted";
+const label = "mb-1.5 block text-[11px] tracking-caps text-muted";
 const error = "mt-1 text-[11px] text-fg/70";
 
 /** id ошибки для aria-describedby */
@@ -56,10 +56,13 @@ export default function QuickBookingForm({ onClose }: { onClose?: () => void }) 
     label: `${q.title} · ${q.ageLimit}`,
   }));
   const timeOptions = TIME_SLOTS.map((t) => ({ value: t, label: t }));
+  // Подписи короткие намеренно: длинные («Стандарт — атмосфера без агрессии»)
+  // обрезались многоточием в поле селекта на экранах 320–360px, и игрок
+  // не видел выбранный уровень, не раскрыв список заново.
   const scareOptions = [
-    { value: "standard", label: "Стандарт — атмосфера без агрессии" },
+    { value: "standard", label: "Стандарт — атмосфера" },
     { value: "intense", label: "Интенсив — актёры рядом" },
-    { value: "extreme", label: "Экстремаль — максимум саспенса" },
+    { value: "extreme", label: "Экстремаль — максимум" },
   ];
 
   // min для date-инпута — только после монтирования (hydration-safe:
@@ -70,7 +73,9 @@ export default function QuickBookingForm({ onClose }: { onClose?: () => void }) 
   }, []);
 
   return (
-    <div className="panel w-full p-5 md:p-7">
+    // Раньше здесь была вложенная .panel — двойная рамка и двойные отступы
+    // (40px по бокам на телефоне). Отступы и рамку даёт BookingModal.
+    <div className="w-full">
       <AnimatePresence mode="wait">
         {status === "success" ? (
           <motion.div
@@ -81,7 +86,7 @@ export default function QuickBookingForm({ onClose }: { onClose?: () => void }) 
             className="flex flex-col items-start gap-4 py-2"
             role="status"
           >
-            <span className="border-fg/40 flex h-10 w-10 items-center justify-center rounded-full border text-fg/80">
+            <span className="flex h-10 w-10 items-center justify-center rounded-full border border-fg/40 text-fg/80">
               <svg
                 width="16"
                 height="16"
@@ -261,7 +266,7 @@ export default function QuickBookingForm({ onClose }: { onClose?: () => void }) 
                   aria-label="Уменьшить количество игроков"
                   disabled={players <= 1}
                   onClick={() => setPlayers(players - 1)}
-                  className="hover:bg-fg/5 min-h-[46px] w-[48px] text-lg text-fg transition-colors disabled:opacity-30"
+                  className="min-h-[46px] w-[48px] text-lg text-fg transition-colors hover:bg-fg/5 disabled:opacity-30"
                 >
                   −
                 </button>
@@ -277,7 +282,7 @@ export default function QuickBookingForm({ onClose }: { onClose?: () => void }) 
                   aria-label="Увеличить количество игроков"
                   disabled={players >= PLAYERS_MAX}
                   onClick={() => setPlayers(players + 1)}
-                  className="hover:bg-fg/5 min-h-[46px] w-[48px] text-lg text-fg transition-colors disabled:opacity-30"
+                  className="min-h-[46px] w-[48px] text-lg text-fg transition-colors hover:bg-fg/5 disabled:opacity-30"
                 >
                   +
                 </button>
@@ -337,11 +342,13 @@ export default function QuickBookingForm({ onClose }: { onClose?: () => void }) 
                 />
                 <span>
                   Согласен(на) на{" "}
+                  {/* py-1 увеличивает область тапа инлайн-ссылки до ~31px,
+                      не влияя на высоту строки (padding инлайн-бокса) */}
                   <Link
                     href="/privacy"
                     target="_blank"
                     onClick={(e) => e.stopPropagation()}
-                    className="text-fg underline decoration-line underline-offset-2 transition-colors hover:text-accent-bright"
+                    className="py-1 text-fg underline decoration-line underline-offset-2 transition-colors hover:text-accent-text"
                   >
                     обработку персональных данных
                   </Link>
@@ -356,7 +363,7 @@ export default function QuickBookingForm({ onClose }: { onClose?: () => void }) 
 
             {status === "error" && (
               <p
-                className="border-fg/30 bg-fg/5 border px-3 py-2 text-[12px] text-fg"
+                className="border border-fg/30 bg-fg/5 px-3 py-2 text-[12px] text-fg"
                 role="alert"
               >
                 Не удалось отправить. Проверьте соединение и попробуйте снова.

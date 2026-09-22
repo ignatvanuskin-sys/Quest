@@ -40,6 +40,10 @@ export const viewport: Viewport = {
   themeColor: "#0a0908",
   width: "device-width",
   initialScale: 1,
+  // cover — фон уходит под «челку»/жесты iPhone. Компенсируется
+  // safe-area отступами в шапке, футере и диалогах (env(safe-area-inset-*)).
+  viewportFit: "cover",
+  colorScheme: "dark",
 };
 
 export default function RootLayout({

@@ -97,29 +97,34 @@ export default function Header() {
   return (
     <>
       <header
-        className={`fixed inset-x-0 top-0 z-[70] flex items-center justify-between px-5 py-4 transition-colors duration-500 md:px-10 md:py-6 ${
+        className={`fixed inset-x-0 top-0 z-[70] flex items-center justify-between px-5 pb-4 pt-[max(1rem,env(safe-area-inset-top))] transition-colors duration-500 md:px-10 md:pb-6 md:pt-[max(1.5rem,env(safe-area-inset-top))] ${
           scrolled
-            ? "bg-bg/85 border-b border-line backdrop-blur-md"
+            ? "border-b border-line bg-bg/85 backdrop-blur-md"
             : "border-b border-transparent bg-transparent"
         }`}
       >
         <button
           type="button"
           onClick={() => go("hero")}
-          className="flex min-h-[44px] flex-col items-start justify-center leading-none"
+          className="flex min-h-[44px] shrink-0 flex-col items-start justify-center leading-none"
           aria-label="NOX — наверх"
         >
           <span className="font-display text-2xl tracking-[0.18em] text-fg">NOX</span>
-          <span className="tracking-caps text-fg/60 mt-1 text-[9px]">MEMENTO MORI</span>
+          {/* Подпись прячем на самых узких экранах (320–399px): иначе логотип
+              сжимается флексом и «MEMENTO MORI» переносится в две строки,
+              а кнопка «Забронировать» упирается в бургер. */}
+          <span className="tracking-caps mt-1 hidden text-[11px] text-fg/60 min-[400px]:block">
+            MEMENTO MORI
+          </span>
         </button>
 
-        <div className="flex items-center gap-3">
+        <div className="flex shrink-0 items-center gap-3">
           <button
             type="button"
             onClick={() => setBookingOpen(true)}
             aria-hidden={open}
             tabIndex={open ? -1 : 0}
-            className={`btn-primary min-h-[44px] px-5 py-2 text-[11px] transition-opacity duration-300 ${
+            className={`btn-primary min-h-[44px] px-4 py-2 text-[11px] transition-opacity duration-300 sm:px-5 ${
               open ? "pointer-events-none opacity-0" : ""
             }`}
           >
@@ -155,12 +160,12 @@ export default function Header() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: reduced ? 0.15 : 0.4 }}
-            className="bg-bg/95 fixed inset-0 z-[60] overflow-y-auto backdrop-blur-md"
+            className="fixed inset-0 z-[60] overflow-y-auto bg-bg/95 backdrop-blur-md"
             aria-label="Основное меню"
           >
             <div
               ref={menuRef}
-              className="mx-auto flex min-h-full w-full max-w-6xl flex-col gap-10 px-6 pb-16 pt-24 md:px-10 lg:flex-row lg:items-start lg:gap-16 lg:pt-32"
+              className="mx-auto flex min-h-full w-full max-w-6xl flex-col gap-10 px-6 pb-[calc(4rem+env(safe-area-inset-bottom))] pt-[calc(6rem+env(safe-area-inset-top))] md:px-10 lg:flex-row lg:items-start lg:gap-16 lg:pt-[calc(8rem+env(safe-area-inset-top))]"
             >
               {/* Навигация */}
               <div className="lg:flex-1">
@@ -168,7 +173,7 @@ export default function Header() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: reduced ? 0 : 0.06 }}
-                  className="tracking-caps text-[10px] text-muted"
+                  className="tracking-caps text-[11px] text-muted"
                 >
                   НАВИГАЦИЯ
                 </motion.p>
@@ -190,10 +195,10 @@ export default function Header() {
                         onClick={() => go(item.id)}
                         className="group flex min-h-[52px] items-baseline gap-4 py-1 text-left"
                       >
-                        <span className="tracking-caps text-[11px] text-muted transition-colors group-hover:text-accent-bright">
+                        <span className="tracking-caps text-[11px] text-muted transition-colors group-hover:text-accent-text">
                           0{i + 1}
                         </span>
-                        <span className="font-display text-3xl text-fg transition-colors group-hover:text-accent-bright md:text-4xl">
+                        <span className="font-display text-3xl text-fg transition-colors group-hover:text-accent-text md:text-4xl">
                           {item.label}
                         </span>
                       </button>
@@ -224,7 +229,7 @@ export default function Header() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: reduced ? 0 : 0.45 }}
-                  className="tracking-caps mt-10 text-[10px] text-muted"
+                  className="tracking-caps mt-10 text-[11px] text-muted"
                 >
                   NOX · QUEST ROOMS · КОМНАТЫ СТРАХА
                 </motion.p>

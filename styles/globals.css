@@ -3,13 +3,20 @@
 @tailwind utilities;
 
 /* ============ Дизайн-токены NOX ============ */
+/* Цвета хранятся как RGB-каналы (без запятых), чтобы Tailwind мог
+   применять модификатор прозрачности через rgb(var(--x) / <alpha-value>).
+   Сырые значения var() в CSS ниже оборачиваются в rgb(). */
 :root {
-  --bg: #0a0908; /* почти чёрный, тёплый оттенок сажи */
-  --bg-alt: #121110;
-  --fg: #ece7df; /* тёплый off-white */
-  --fg-muted: #8a8580;
-  --accent: #7a0f16; /* приглушённый кровавый */
-  --accent-bright: #b3222c;
+  --bg: 10 9 8; /* почти чёрный, тёплый оттенок сажи */
+  --bg-alt: 18 17 16;
+  --fg: 236 231 223; /* тёплый off-white */
+  --fg-muted: 138 133 128;
+  --accent: 122 15 22; /* приглушённый кровавый */
+  --accent-bright: 179 34 44;
+  /* Тот же кровавый, но осветлённый под мелкий текст на тёмном фоне:
+     #b3222c даёт всего 2.86:1 к --bg (провал WCAG AA), этот — 5.03:1.
+     Используется ТОЛЬКО как цвет текста/иконок, не для фонов и рамок. */
+  --accent-text: 220 81 88;
   --line: rgba(236, 231, 223, 0.12);
   --font-display: "Cormorant", Georgia, serif;
   --font-body: "Manrope", system-ui, sans-serif;
@@ -17,7 +24,7 @@
 }
 
 html {
-  background-color: var(--bg);
+  background-color: rgb(var(--bg));
   scroll-behavior: auto; /* скроллом управляет Lenis */
 }
 
@@ -34,16 +41,16 @@ html.lenis body {
 
 body {
   font-family: var(--font-body);
-  color: var(--fg);
-  background-color: var(--bg);
+  color: rgb(var(--fg));
+  background-color: rgb(var(--bg));
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   overflow-x: hidden;
 }
 
 ::selection {
-  background: var(--accent);
-  color: var(--fg);
+  background: rgb(var(--accent));
+  color: rgb(var(--fg));
 }
 
 /* Тонкий скроллбар в стиле сайта */
@@ -61,7 +68,7 @@ body {
 
 /* Видимые фокус-стейты (WCAG) */
 :focus-visible {
-  outline: 2px solid var(--accent-bright);
+  outline: 2px solid rgb(var(--accent-bright));
   outline-offset: 3px;
   border-radius: 2px;
 }
@@ -113,7 +120,7 @@ body {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M2.5 8.5l3.5 3.5 7-8' stroke='%23ece7df' stroke-width='2'/%3E%3C/svg%3E");
   }
   .checkbox:focus-visible {
-    outline: 2px solid var(--accent-bright);
+    outline: 2px solid rgb(var(--accent-bright));
     outline-offset: 2px;
   }
 
@@ -206,9 +213,12 @@ body {
     }
   }
 
-  /* Карточка с тонкой рамкой */
+  /* Карточка с тонкой рамкой.
+     overscroll-behavior: contain — при скролле внутри карточки (мобильные
+     диалоги, длинные панели) жест не «протекает» на страницу под ней. */
   .panel {
     @apply border border-line bg-bg-alt;
+    overscroll-behavior: contain;
   }
 
   /* Фильтр-чип */
@@ -388,7 +398,7 @@ body {
   top: -40%;
   width: 100%;
   height: 40%;
-  background: var(--fg);
+  background: rgb(var(--fg));
   animation: scroll-drop 2.2s var(--ease-cinematic) infinite;
 }
 @keyframes scroll-drop {
@@ -486,7 +496,7 @@ body.has-custom-cursor button {
   display: block;
   height: 100%;
   width: 0;
-  background: var(--accent-bright);
+  background: rgb(var(--accent-bright));
   animation: quest-fill linear forwards;
 }
 [data-showcase-paused="true"] .quest-progress-fill {
@@ -515,7 +525,7 @@ body.has-custom-cursor button {
   width: 6px;
   height: 6px;
   border-radius: 9999px;
-  background: var(--accent-bright);
+  background: rgb(var(--accent-bright));
   box-shadow:
     0 0 8px 2px rgba(179, 34, 44, 0.9),
     0 0 18px 6px rgba(122, 15, 22, 0.45);

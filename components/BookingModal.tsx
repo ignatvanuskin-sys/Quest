@@ -71,7 +71,7 @@ export default function BookingModal({ open, onClose }: BookingModalProps) {
             type="button"
             aria-label="Закрыть"
             tabIndex={-1}
-            className="bg-bg/80 absolute inset-0 h-full w-full cursor-default backdrop-blur-sm"
+            className="absolute inset-0 h-full w-full cursor-default bg-bg/80 backdrop-blur-sm"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -91,13 +91,12 @@ export default function BookingModal({ open, onClose }: BookingModalProps) {
             {/* Пугающие красные глаза, выглядывающие из тьмы (фон диалога) */}
             <RedEyes />
 
-            {/* Шапка диалога */}
-            <div className="relative overflow-visible border-b border-line px-5 pb-6 pt-6 md:px-7">
+            {/* Шапка диалога. safe-area сверху — на iPhone с «челкой»
+                диалог полноэкранный, кнопка закрытия не должна уезжать под вырез. */}
+            <div className="relative overflow-visible border-b border-line px-5 pb-6 pt-[calc(1.5rem+env(safe-area-inset-top))] md:px-7 md:pt-6">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <p className="tracking-caps text-[10px] text-muted">
-                    ЗАПИСЬ НА ИГРУ
-                  </p>
+                  <p className="tracking-caps text-[11px] text-muted">ЗАПИСЬ НА ИГРУ</p>
                   <p className="mt-1 font-display text-2xl leading-tight text-fg">
                     Забронировать квест
                   </p>
@@ -107,7 +106,7 @@ export default function BookingModal({ open, onClose }: BookingModalProps) {
                   type="button"
                   onClick={onClose}
                   aria-label="Закрыть бронирование"
-                  className="bg-bg/60 flex h-[44px] w-[44px] shrink-0 items-center justify-center border border-line text-fg transition-colors hover:border-fg/60 hover:text-fg"
+                  className="flex h-[44px] w-[44px] shrink-0 items-center justify-center border border-line bg-bg/60 text-fg transition-colors hover:border-fg/60 hover:text-fg"
                 >
                   <svg
                     width="16"
@@ -127,7 +126,7 @@ export default function BookingModal({ open, onClose }: BookingModalProps) {
             </div>
 
             {/* Форма записи */}
-            <div className="bg-bg-alt/40 px-5 py-5 md:px-7 md:py-6">
+            <div className="bg-bg-alt/40 px-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] pt-5 md:px-7 md:py-6">
               <QuickBookingForm onClose={onClose} />
             </div>
           </motion.div>

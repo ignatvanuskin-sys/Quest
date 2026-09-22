@@ -190,10 +190,10 @@ export default function Hero() {
         </h1>
 
         <div ref={subRef} className="flex flex-col items-center">
-          <p className="text-fg/80 mt-2 text-[11px] tracking-[0.5em] md:text-sm">
+          <p className="mt-2 text-[11px] tracking-[0.5em] text-fg/80 md:text-sm">
             MEMENTO&nbsp;MORI
           </p>
-          <p className="text-fg/70 mt-8 max-w-md text-base md:text-lg">
+          <p className="mt-8 max-w-md text-base text-fg/70 md:text-lg">
             Ты готов узнать, чего боишься на самом деле?
           </p>
           <div className="mt-10 flex w-full max-w-md flex-col gap-3 sm:flex-row sm:justify-center">
@@ -216,8 +216,8 @@ export default function Hero() {
       </div>
 
       {/* Индикатор скролла */}
-      <div className="absolute bottom-7 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-3">
-        <span className="tracking-caps text-fg/50 text-[10px]">SCROLL</span>
+      <div className="absolute bottom-[calc(1.75rem+env(safe-area-inset-bottom))] left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-3">
+        <span className="tracking-caps text-[11px] text-fg/60">SCROLL</span>
         <div className="scroll-line" aria-hidden="true" />
       </div>
     </section>

@@ -181,7 +181,7 @@ export default function QuestShowcase({ onOpen }: QuestShowcaseProps) {
             onClick={() => go(i)}
             className="group/nav flex min-h-[44px] flex-1 flex-col justify-center gap-2 px-1"
           >
-            <span className="bg-fg/20 block h-px w-full">
+            <span className="block h-px w-full bg-fg/20">
               {i === active && !reduced ? (
                 <span
                   key={active}
@@ -191,8 +191,8 @@ export default function QuestShowcase({ onOpen }: QuestShowcaseProps) {
               ) : null}
             </span>
             <span
-              className={`tracking-caps hidden text-left text-[10px] transition-colors md:block ${
-                i === active ? "text-fg" : "text-muted/70 group-hover/nav:text-fg"
+              className={`tracking-caps hidden text-left text-[11px] transition-colors md:block ${
+                i === active ? "text-fg" : "text-muted group-hover/nav:text-fg"
               }`}
             >
               {q.title}
@@ -207,7 +207,7 @@ export default function QuestShowcase({ onOpen }: QuestShowcaseProps) {
       {/* Контент текущего квеста */}
       <div className="relative z-10 flex flex-col gap-3 p-5 md:p-8">
         <div className="flex items-start justify-between gap-3">
-          <span className="min-w-0 flex-1 text-[10px] uppercase leading-relaxed tracking-[0.16em] text-accent-bright">
+          <span className="min-w-0 flex-1 text-[11px] uppercase leading-relaxed tracking-[0.16em] text-accent-text">
             {quest.genreLabel} · {quest.ageLimit}
           </span>
           <span className="shrink-0 font-display text-sm text-muted" aria-live="polite">
@@ -228,15 +228,15 @@ export default function QuestShowcase({ onOpen }: QuestShowcaseProps) {
             <h3 className="font-display text-3xl leading-tight text-fg md:text-5xl">
               {quest.title}
             </h3>
-            <p className="text-fg/80 mt-2 max-w-xl text-sm leading-relaxed md:text-base">
+            <p className="mt-2 max-w-xl text-sm leading-relaxed text-fg/80 md:text-base">
               {quest.teaser}
             </p>
-            <div className="text-fg/70 mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] tracking-wide">
+            <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] tracking-wide text-fg/70">
               <span>{quest.durationMin} мин</span>
               <span>
                 {quest.playersMin}–{quest.playersMax} игроков
               </span>
-              <span className="text-accent-bright">
+              <span className="text-accent-text">
                 от {quest.priceFrom.toLocaleString("ru-RU")} ₽
               </span>
             </div>

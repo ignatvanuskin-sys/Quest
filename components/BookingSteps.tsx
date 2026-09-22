@@ -66,7 +66,7 @@ export default function BookingSteps() {
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(90deg, var(--bg) 0%, rgba(10,9,8,0.5) 50%, rgba(10,9,8,0.2) 100%)",
+              "linear-gradient(90deg, rgb(var(--bg)) 0%, rgba(10,9,8,0.5) 50%, rgba(10,9,8,0.2) 100%)",
           }}
         />
       </div>
@@ -97,12 +97,12 @@ export default function BookingSteps() {
                 viewBox="0 0 24 24"
                 fill="currentColor"
                 aria-hidden="true"
-                className="text-fg/70 shrink-0"
+                className="shrink-0 text-fg/70"
               >
                 {s.icon}
               </svg>
               <div>
-                <p className="tracking-caps text-[10px] text-accent-bright">{s.n}</p>
+                <p className="tracking-caps text-[11px] text-accent-text">{s.n}</p>
                 <h3 className="mt-2 font-display text-xl text-fg">{s.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted">{s.text}</p>
               </div>

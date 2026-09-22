@@ -56,7 +56,7 @@ export default function CustomCursor() {
       if (ring) {
         ring.style.transform = `translate3d(${rx}px, ${ry}px, 0) translate(-50%, -50%) scale(${hovering ? 1.7 : 1})`;
         ring.style.borderColor = hovering
-          ? "var(--accent-bright)"
+          ? "rgb(var(--accent-bright))"
           : "rgba(236,231,223,0.55)";
       }
       if (glow) {

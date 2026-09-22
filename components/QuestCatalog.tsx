@@ -111,12 +111,15 @@ export default function QuestCatalog() {
           </div>
         </Reveal>
 
-        {/* Карточки. key={filter} — смена фильтра перезапускает stagger-reveal */}
+        {/* Карточки. key={filter} — смена фильтра перезапускает stagger-reveal.
+            scroll-pl-6 критично на мобильном: без него scroll-snap выравнивает
+            первую карточку по кромке скроллпорта и она прилипает к краю экрана,
+            теряя общий отступ 24px (шапка/заголовок остаются с отступом). */}
         <div
           key={filter}
           ref={rowRef}
           onScroll={onRowScroll}
-          className="snap-row -mx-6 mt-10 flex gap-4 overflow-x-auto px-6 pb-4 md:mx-0 md:mt-12 md:grid md:grid-cols-2 md:gap-6 md:overflow-visible md:px-0 md:pb-0 lg:grid-cols-3 xl:grid-cols-4"
+          className="snap-row -mx-6 mt-10 flex scroll-pl-6 gap-4 overflow-x-auto px-6 pb-4 md:mx-0 md:mt-12 md:grid md:scroll-pl-0 md:grid-cols-2 md:gap-6 md:overflow-visible md:px-0 md:pb-0 lg:grid-cols-3 xl:grid-cols-4"
         >
           {visible.map((quest, i) => (
             <QuestCard key={quest.slug} quest={quest} index={i} onOpen={setActive} />

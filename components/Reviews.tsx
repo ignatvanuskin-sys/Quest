@@ -21,7 +21,7 @@ function initials(name: string): string {
 function Stars({ value }: { value: number }) {
   return (
     <div
-      className="flex gap-1 text-accent-bright"
+      className="flex gap-1 text-accent-text"
       aria-label={`Оценка ${value.toFixed(1)} из 5`}
     >
       {Array.from({ length: 5 }, (_, i) => {
@@ -92,7 +92,7 @@ export default function Reviews() {
               </div>
               <div>
                 <Stars value={AVG} />
-                <p className="tracking-caps mt-1.5 text-[10px] text-muted">
+                <p className="tracking-caps mt-1.5 text-[11px] text-muted">
                   НА ОСНОВЕ {REVIEWS.length} ОТЗЫВОВ
                 </p>
               </div>
@@ -117,7 +117,7 @@ export default function Reviews() {
                 }`}
               >
                 <span
-                  className={`text-accent-bright/10 pointer-events-none absolute right-6 top-1 select-none font-display leading-none ${
+                  className={`pointer-events-none absolute right-6 top-1 select-none font-display leading-none text-accent-bright/10 ${
                     featured ? "text-9xl" : "text-7xl"
                   }`}
                   aria-hidden="true"
@@ -128,7 +128,7 @@ export default function Reviews() {
                 {/* Шапка карточки: аватар, имя, дата */}
                 <div className="flex items-center gap-4">
                   <span
-                    className={`border-accent-bright/40 bg-accent/15 flex shrink-0 items-center justify-center rounded-full border font-display text-accent-bright ${
+                    className={`flex shrink-0 items-center justify-center rounded-full border border-accent-bright/40 bg-accent/15 font-display text-accent-text ${
                       featured ? "h-14 w-14 text-base" : "h-11 w-11 text-sm"
                     }`}
                     aria-hidden="true"
@@ -141,7 +141,7 @@ export default function Reviews() {
                     >
                       {r.name}
                     </p>
-                    <p className="tracking-caps mt-0.5 text-[10px] text-muted">
+                    <p className="tracking-caps mt-0.5 text-[11px] text-muted">
                       {r.date}
                     </p>
                   </div>
@@ -152,7 +152,7 @@ export default function Reviews() {
 
                 {/* Текст отзыва */}
                 <blockquote
-                  className={`text-fg/85 leading-relaxed ${
+                  className={`leading-relaxed text-fg/85 ${
                     featured ? "text-base md:text-lg" : "text-sm"
                   }`}
                 >
@@ -161,13 +161,13 @@ export default function Reviews() {
 
                 {/* Подвал карточки: квест + верификация */}
                 <div className="mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4">
-                  <span className="tracking-caps border border-line bg-bg-alt px-3 py-1.5 text-[10px] text-muted">
+                  <span className="tracking-caps border border-line bg-bg-alt px-3 py-1.5 text-[11px] text-muted">
                     КВЕСТ:{" "}
-                    <span className="text-accent-bright">
+                    <span className="text-accent-text">
                       {questTitle(r.questSlug).toUpperCase()}
                     </span>
                   </span>
-                  <span className="tracking-caps text-muted/70 flex items-center gap-1.5 text-[10px]">
+                  <span className="tracking-caps flex items-center gap-1.5 text-[11px] text-muted">
                     <svg
                       width="12"
                       height="12"
@@ -190,7 +190,7 @@ export default function Reviews() {
         })}
       </div>
 
-      <p className="tracking-caps text-muted/70 mx-auto mt-8 max-w-6xl px-6 text-[11px]">
+      <p className="tracking-caps mx-auto mt-8 max-w-6xl px-6 text-[11px] text-muted">
         Все отзывы — от гостей, реально прошедших комнаты
       </p>
     </section>

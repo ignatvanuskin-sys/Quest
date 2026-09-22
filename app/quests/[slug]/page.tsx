@@ -83,7 +83,7 @@ export default function QuestPage({ params }: QuestPageProps) {
   };
 
   return (
-    <main className="mx-auto max-w-3xl px-6 pb-28 pt-28 md:pt-36">
+    <main className="mx-auto max-w-3xl px-6 pb-28 pt-[calc(7rem+env(safe-area-inset-top))] md:pt-36">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -120,7 +120,7 @@ export default function QuestPage({ params }: QuestPageProps) {
             }}
           />
           <div className="absolute bottom-5 left-6 right-6 md:left-8 md:right-8">
-            <span className="tracking-caps text-fg/70 text-[10px]">
+            <span className="tracking-caps text-[11px] text-fg/70">
               {quest.genreLabel} · {quest.ageLimit}
             </span>
             <h1 className="mt-1 font-display text-4xl text-fg md:text-5xl">

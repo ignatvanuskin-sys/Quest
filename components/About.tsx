@@ -43,7 +43,7 @@ export default function About() {
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(90deg, var(--bg) 0%, rgba(10,9,8,0.55) 45%, rgba(10,9,8,0.15) 100%)",
+              "linear-gradient(90deg, rgb(var(--bg)) 0%, rgba(10,9,8,0.55) 45%, rgba(10,9,8,0.15) 100%)",
           }}
         />
       </div>

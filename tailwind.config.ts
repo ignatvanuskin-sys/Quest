@@ -5,12 +5,14 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        bg: "var(--bg)",
-        "bg-alt": "var(--bg-alt)",
-        fg: "var(--fg)",
-        muted: "var(--fg-muted)",
-        accent: "var(--accent)",
-        "accent-bright": "var(--accent-bright)",
+        bg: "rgb(var(--bg) / <alpha-value>)",
+        "bg-alt": "rgb(var(--bg-alt) / <alpha-value>)",
+        fg: "rgb(var(--fg) / <alpha-value>)",
+        muted: "rgb(var(--fg-muted) / <alpha-value>)",
+        accent: "rgb(var(--accent) / <alpha-value>)",
+        "accent-bright": "rgb(var(--accent-bright) / <alpha-value>)",
+        // Осветлённый акцент для мелкого текста (WCAG AA на тёмном фоне)
+        "accent-text": "rgb(var(--accent-text) / <alpha-value>)",
         line: "var(--line)",
       },
       fontFamily: {
