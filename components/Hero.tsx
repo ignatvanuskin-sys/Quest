@@ -217,8 +217,9 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Индикатор скролла */}
-      <div className="absolute bottom-[calc(1.75rem+env(safe-area-inset-bottom))] left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-3">
+      {/* Индикатор скролла. .scroll-hint прячется на низких экранах
+          (max-height: 620px) — там он упирается в кнопки. */}
+      <div className="scroll-hint absolute bottom-[calc(1.75rem+env(safe-area-inset-bottom))] left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-3">
         <span className="tracking-caps text-[11px] text-fg/60">SCROLL</span>
         <div className="scroll-line" aria-hidden="true" />
       </div>

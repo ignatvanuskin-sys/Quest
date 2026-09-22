@@ -391,6 +391,15 @@ body {
   background: var(--line);
   overflow: hidden;
 }
+
+/* На низких экранах (320×568 и подобных) контент hero занимает всю высоту,
+   и индикатор скролла упирается в кнопки с зазором 0px. Подсказка не
+   критична — на таких экранах её прячем, чтобы не было слипания. */
+@media (max-height: 620px) {
+  .scroll-hint {
+    display: none;
+  }
+}
 .scroll-line::after {
   content: "";
   position: absolute;
