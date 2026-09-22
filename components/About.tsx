@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Reveal from "@/components/Reveal";
+import { QUESTS } from "@/lib/quests";
 
 const LINES = [
   "NOX — это не аттракцион. Это час, в который вы забудете, что происходящее — постановка.",
@@ -9,8 +10,22 @@ const LINES = [
   "Мы не пугаем скримерами — мы строим напряжение, которое не отпускает.",
 ];
 
+/** «4 комнаты» / «5 комнат» — правильная форма для числа из каталога */
+function roomsLabel(n: number): string {
+  const mod10 = n % 10;
+  const mod100 = n % 100;
+  if (mod10 === 1 && mod100 !== 11) return "комната";
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return "комнаты";
+  return "комнат";
+}
+
+/**
+ * Число комнат берётся из каталога (lib/quests.ts), а не хардкодится:
+ * раньше здесь стояло «5 комнат» при четырёх квестах в каталоге —
+ * расхождение было видно невооружённым глазом.
+ */
 const STATS = [
-  { value: "5", label: "комнат" },
+  { value: String(QUESTS.length), label: roomsLabel(QUESTS.length) },
   { value: "40+", label: "актёров-аниматоров" },
   { value: "16 000", label: "прошедших квест" },
 ];
@@ -55,7 +70,7 @@ export default function About() {
       <div className="mt-8 space-y-8">
         {LINES.map((line, i) => (
           <Reveal key={i} delay={i * 0.12}>
-            <p className="text-fg/90 font-display text-2xl leading-snug md:text-4xl">
+            <p className="font-display text-2xl leading-snug text-fg/90 md:text-4xl">
               {line}
             </p>
           </Reveal>
