@@ -92,7 +92,9 @@ export default function QuestModal({ quest, onClose }: QuestModalProps) {
         <button
           type="button"
           aria-label="Закрыть"
-          className="h-full w-full cursor-default touch-none bg-bg/80 backdrop-blur-sm"
+          /* Без полноэкранного backdrop-blur: на телефоне он дорогой и давал
+             лаги при открытии диалогов. Затемнение оставляем. */
+          className="h-full w-full cursor-default touch-none bg-bg/85"
           onClick={onClose}
         />
       </motion.div>

@@ -133,37 +133,45 @@ describe("системное «Назад» (popstate)", () => {
   });
 });
 
-describe("уборка «израсходованной» записи", () => {
-  it("после программного закрытия «Назад» сразу покидает страницу", async () => {
+describe("программное закрытие (крестик, Esc, клик по пункту меню)", () => {
+  it("помечает запись израсходованной и НЕ выполняет переход", async () => {
     vi.useFakeTimers();
     const { pushOverlay, popOverlay } = await load();
     const d = pushOverlay(() => {});
     expect(history.length).toBe(2);
 
     popOverlay(d);
-    // до уборки запись ещё на месте
+
     expect(history.index).toBe(1);
+    expect(history.state).toMatchObject({ __noxOverlayConsumed: true });
 
-    vi.advanceTimersByTime(1);
-
-    // запись убрана: пользователю не нужно нажимать «Назад» дважды
-    expect(history.index).toBe(0);
+    // Раньше здесь планировался history.back(). На телефоне браузер выполняет
+    // переход не мгновенно, и если гость успевал снова открыть меню, попавший
+    // в это окно popstate закрывал его сам — меню мигало и казалось нерабочим.
+    vi.advanceTimersByTime(5000);
+    expect(history.index).toBe(1);
   });
 
-  it("не убирает запись, если за это время открылся новый оверлей", async () => {
-    vi.useFakeTimers();
+  it("следующее открытие переиспользует запись — история не растёт", async () => {
     const { pushOverlay, popOverlay } = await load();
-    const first = pushOverlay(() => {});
-    popOverlay(first);
+    const d1 = pushOverlay(() => {});
+    popOverlay(d1);
+    expect(history.length).toBe(2);
 
+    const d2 = pushOverlay(() => {});
+    expect(history.length).toBe(2);
+    expect(history.state).toMatchObject({ __noxOverlayDepth: 1 });
+    popOverlay(d2);
+  });
+
+  it("«Назад» после программного закрытия ничего лишнего не закрывает", async () => {
+    const { pushOverlay, popOverlay } = await load();
     const close = vi.fn();
-    pushOverlay(close);
-    vi.advanceTimersByTime(1);
+    popOverlay(pushOverlay(close));
 
-    // Запись занята новым оверлеем: отложенная уборка не должна её выкинуть,
-    // иначе «Назад» перестанет закрывать этот оверлей.
-    expect(history.index).toBe(1);
     history.back();
-    expect(close).toHaveBeenCalledTimes(1);
+
+    expect(close).not.toHaveBeenCalled();
+    expect(history.index).toBe(0);
   });
 });

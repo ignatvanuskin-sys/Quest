@@ -93,7 +93,10 @@ export default function BookingModal({ open, onClose }: BookingModalProps) {
               type="button"
               aria-label="Закрыть"
               tabIndex={-1}
-              className="h-full w-full cursor-default touch-none bg-bg/80 backdrop-blur-sm"
+              /* Без backdrop-blur: полноэкранное размытие поверх страницы
+                 с играющим видео и WebGL-канвасом стоит на телефоне дорого —
+                 именно из-за него диалоги «лагали». Затемнение оставляем. */
+              className="h-full w-full cursor-default touch-none bg-bg/85"
               onClick={onClose}
             />
           </motion.div>

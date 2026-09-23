@@ -615,10 +615,14 @@ body.has-custom-cursor button {
 }
 
 /* Пока открыт оверлей: гасим scroll-chaining и «отскок» (rubber-band) на iOS,
-   из-за которых жест по бэкдропу утаскивал фон под модалкой. Само скрытие
-   прокрутки ставит lib/scroll-lock (инлайн overflow:hidden + класс). */
-html.scroll-locked,
-html.scroll-locked body {
+   из-за которых жест по бэкдропу утаскивал фон под модалкой.
+   Само скрытие прокрутки ставит lib/scroll-lock (инлайн overflow:hidden + класс).
+
+   ВАЖНО: `overflow: hidden` вешаем ТОЛЬКО на <html>, не на <body>. На iOS Safari
+   hidden на body ломает позиционирование fixed-слоёв — оверлеи подпрыгивают и
+   «пропадают» на кадр. Проверено на телефоне: с hidden на body меню и диалоги
+   мигали, с hidden только на html — нет. */
+html.scroll-locked {
   overflow: hidden;
   overscroll-behavior: none;
 }
