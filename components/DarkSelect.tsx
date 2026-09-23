@@ -48,7 +48,12 @@ export default function DarkSelect({
       if (!rootRef.current?.contains(e.target as Node)) setOpen(false);
     };
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
+      if (e.key === "Escape") {
+        setOpen(false);
+        // Фокус стоит на исчезающем пункте списка — после закрытия он
+        // «улетает» в body. Возвращаем его на кнопку-триггер.
+        rootRef.current?.querySelector<HTMLButtonElement>("button")?.focus();
+      }
     };
     document.addEventListener("pointerdown", onDown);
     document.addEventListener("keydown", onKey);
@@ -135,14 +140,29 @@ export default function DarkSelect({
                     if (e.key === "Enter" || e.key === " ") {
                       e.preventDefault();
                       pick(o.value);
+                      return;
                     }
-                    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+                    if (
+                      e.key === "ArrowDown" ||
+                      e.key === "ArrowUp" ||
+                      e.key === "Home" ||
+                      e.key === "End"
+                    ) {
                       e.preventDefault();
                       const items = Array.from(
                         listRef.current?.querySelectorAll<HTMLElement>(
                           '[role="option"]'
                         ) ?? []
                       );
+                      if (items.length === 0) return;
+                      if (e.key === "Home") {
+                        items[0]?.focus();
+                        return;
+                      }
+                      if (e.key === "End") {
+                        items[items.length - 1]?.focus();
+                        return;
+                      }
                       const i = items.indexOf(e.currentTarget as HTMLElement);
                       const next =
                         items[
@@ -152,7 +172,12 @@ export default function DarkSelect({
                       next?.focus();
                     }
                   }}
-                  className={`flex min-h-[44px] w-full cursor-pointer items-center px-3.5 py-2.5 text-left text-[14px] transition-colors hover:bg-fg/10 focus:bg-fg/10 focus:outline-none ${
+                  // focus-visible, а не focus: подсказка нужна клавиатуре, но не мыши.
+                  // outline-offset уводим внутрь — контур не должен вылезать за
+                  // границы прокручиваемого списка. Раньше здесь стоял
+                  // focus:outline-none, который глушил глобальное фокус-кольцо
+                  // (у пунктов оставалась подсказка ~1.26:1 — провал WCAG 2.4.7).
+                  className={`flex min-h-[44px] w-full cursor-pointer items-center px-3.5 py-2.5 text-left text-[14px] transition-colors hover:bg-fg/10 focus-visible:[outline-offset:-2px] ${
                     selected ? "bg-fg/10 text-fg" : "text-fg/85"
                   }`}
                 >

@@ -1,12 +1,20 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "404 — Здесь никого нет. NOX",
+  description:
+    "Такой страницы нет. Вернитесь на главную или выберите квест в каталоге NOX.",
+  // 404 не должна попадать в индекс: иначе поисковик держит «пустую» страницу
+  robots: { index: false, follow: false },
 };
 
 export default function NotFound() {
   return (
-    <main className="relative flex min-h-[100dvh] flex-col items-center justify-center px-6 text-center">
+    <main
+      id="main"
+      className="relative flex min-h-[100dvh] flex-col items-center justify-center px-6 text-center"
+    >
       <p className="tracking-caps text-[11px] text-muted">ОШИБКА 404</p>
       <h1
         className="flicker-soft mt-4 font-display font-semibold leading-none text-fg"

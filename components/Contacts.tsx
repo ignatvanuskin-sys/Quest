@@ -1,8 +1,7 @@
-"use client";
-
 import Reveal from "@/components/Reveal";
 import QuestArt from "@/components/QuestArt";
 import { CONTACTS, SOCIAL_LINKS } from "@/lib/contacts";
+import { VIDEO_RECORD_PRICE } from "@/lib/site";
 
 /**
  * Локация и контакты.
@@ -117,7 +116,7 @@ export default function Contacts() {
                     className="mt-[9px] h-px w-4 shrink-0 bg-accent-bright"
                     aria-hidden="true"
                   />
-                  Видеозапись прохождения +1 500 ₽
+                  Видеозапись прохождения +{VIDEO_RECORD_PRICE}
                 </li>
               </ul>
             </div>

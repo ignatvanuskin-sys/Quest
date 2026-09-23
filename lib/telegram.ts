@@ -14,10 +14,6 @@ export interface TelegramResult {
   loggedOnly?: boolean;
 }
 
-export function isTelegramConfigured(): boolean {
-  return !!process.env.TELEGRAM_BOT_TOKEN && !!process.env.TELEGRAM_CHAT_ID;
-}
-
 export async function sendTelegramMessage(text: string): Promise<TelegramResult> {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;

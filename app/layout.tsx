@@ -10,11 +10,10 @@ import CustomCursor from "@/components/CustomCursor";
 import Header from "@/components/Header";
 import BootLoader from "@/components/BootLoader";
 import Analytics from "@/components/Analytics";
+import { SITE_URL, SITE_NAME } from "@/lib/site";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "https://qwest-scary.vercel.app"
-  ),
+  metadataBase: new URL(SITE_URL),
   title: "NOX — комнаты страха. Квесты с актёрами и полным погружением",
   description:
     "NOX — премиальные постановочные квесты: живые актёры, реальные декорации, звук и свет, которые работают против вас. Выберите свой страх и забронируйте время.",
@@ -25,6 +24,9 @@ export const metadata: Metadata = {
     title: "NOX — MEMENTO MORI",
     description: "Ты готов узнать, чего боишься на самом деле?",
     type: "website",
+    locale: "ru_RU",
+    siteName: SITE_NAME,
+    url: "/",
     images: [
       {
         url: "/media/og-image.jpg",
@@ -33,6 +35,12 @@ export const metadata: Metadata = {
         alt: "NOX — ворон на викторианском кресле в заброшенном особняке",
       },
     ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "NOX — MEMENTO MORI",
+    description: "Ты готов узнать, чего боишься на самом деле?",
+    images: ["/media/og-image.jpg"],
   },
 };
 

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { QUESTS, TIME_SLOTS } from "@/lib/quests";
 import { useBookingForm } from "@/lib/useBookingForm";
 import { PLAYERS_MAX, todayLocalISO } from "@/lib/validation";
+import { VIDEO_RECORD_PRICE } from "@/lib/site";
 import DarkSelect from "@/components/DarkSelect";
 
 // Стили полей — общие классы из styles/globals.css (.field-input,
@@ -264,6 +265,10 @@ export default function QuickBookingForm({ onClose }: { onClose?: () => void }) 
                 <output
                   id="q-players"
                   aria-live="polite"
+                  // aria-invalid здесь невалиден: у role="status" (неявная роль
+                  // <output>) он не поддерживается. Ошибку доносит текст ниже,
+                  // связанный через aria-describedby.
+                  aria-describedby={errors.players ? errId("players") : undefined}
                   className="flex flex-1 items-center justify-center border-x border-line text-[14px] text-fg"
                 >
                   {players}
@@ -279,7 +284,7 @@ export default function QuickBookingForm({ onClose }: { onClose?: () => void }) 
                 </button>
               </div>
               {errors.players?.message && (
-                <p className={error} role="alert">
+                <p id={errId("players")} className={error} role="alert">
                   {errors.players.message}
                 </p>
               )}
@@ -298,7 +303,7 @@ export default function QuickBookingForm({ onClose }: { onClose?: () => void }) 
                   {...register("videoRecord")}
                 />
                 <span>
-                  Видеозапись <span className="text-fg">+1 500 ₽</span>
+                  Видеозапись <span className="text-fg">+{VIDEO_RECORD_PRICE}</span>
                 </span>
               </label>
             </div>

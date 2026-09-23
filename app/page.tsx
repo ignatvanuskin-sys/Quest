@@ -7,11 +7,9 @@ import Reviews from "@/components/Reviews";
 import SafetyFaq from "@/components/SafetyFaq";
 import Contacts from "@/components/Contacts";
 import Footer from "@/components/Footer";
-import { REVIEWS, REVIEWS_AVG, REVIEWS_COUNT } from "@/lib/reviews";
 import { FAQ_ITEMS } from "@/lib/faq";
 import { CONTACTS, SOCIAL_LINKS } from "@/lib/contacts";
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://qwest-scary.vercel.app";
+import { SITE_URL } from "@/lib/site";
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -45,52 +43,38 @@ const faqJsonLd = {
   })),
 };
 
-// Отзывы для JSON-LD — из lib/reviews.ts (единственный источник,
-// UI и schema всегда согласованы). Данные — демо-плейсхолдеры.
-const reviewsJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Product",
-  name: "NOX — квест-румы",
-  aggregateRating: {
-    "@type": "AggregateRating",
-    ratingValue: REVIEWS_AVG.toFixed(1),
-    reviewCount: String(REVIEWS_COUNT),
-    bestRating: "5",
-    worstRating: "1",
-  },
-  review: REVIEWS.map((r) => ({
-    "@type": "Review",
-    author: { "@type": "Person", name: r.name },
-    datePublished: r.dateISO,
-    reviewRating: { "@type": "Rating", ratingValue: String(r.rating), bestRating: "5" },
-    reviewBody: r.text,
-  })),
-};
+// РАЗМЕТКА ОТЗЫВОВ УДАЛЕНА НАМЕРЕННО.
+// Здесь была разметка Product + aggregateRating + 7 review, собранная из
+// lib/reviews.ts, где данные прямо помечены как DEMO/PLACEHOLDER, а в UI
+// (components/Reviews.tsx) при этом сказано «все отзывы — от гостей, реально
+// прошедших комнаты». Разметка отзывов, за которой не стоит настоящий UGC,
+// нарушает правила Google — это риск ручной санкции и потери сниппета.
+// Вернуть разметку можно только вместе с реальными отзывами.
+// Пока отзывы живут только в интерфейсе, без schema.org.
 
 export default function HomePage() {
   return (
-    <main id="main">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(reviewsJsonLd) }}
-      />
-      <Hero />
-      <About />
-      <QuestCatalog />
-      <SmokeHeartBand />
-      <BookingSteps />
-      <Reviews />
-      <SafetyFaq />
-      <Contacts />
+    <>
+      <main id="main">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        />
+        <Hero />
+        <About />
+        <QuestCatalog />
+        <SmokeHeartBand />
+        <BookingSteps />
+        <Reviews />
+        <SafetyFaq />
+        <Contacts />
+      </main>
+      {/* Подвал ВНЕ main: внутри main он теряет landmark contentinfo */}
       <Footer />
-    </main>
+    </>
   );
 }

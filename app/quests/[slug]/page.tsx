@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { QUESTS, getQuestBySlug } from "@/lib/quests";
+import { CONTACTS } from "@/lib/contacts";
+import { SITE_URL } from "@/lib/site";
 import QuestArt from "@/components/QuestArt";
 import QuestDetailsBody from "@/components/QuestDetailsBody";
 import BookQuestButton from "@/components/BookQuestButton";
 import Reveal from "@/components/Reveal";
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://qwest-scary.vercel.app";
 
 interface QuestPageProps {
   params: { slug: string };
@@ -34,6 +34,9 @@ export function generateMetadata({ params }: QuestPageProps): Metadata {
       title: `${quest.title} — NOX`,
       description: quest.teaser,
       type: "website",
+      locale: "ru_RU",
+      siteName: "NOX",
+      url: `/quests/${quest.slug}`,
       images: [
         {
           url: quest.cover,
@@ -42,6 +45,12 @@ export function generateMetadata({ params }: QuestPageProps): Metadata {
           alt: `Квест «${quest.title}»`,
         },
       ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${quest.title} — NOX`,
+      description: quest.teaser,
+      images: [quest.cover],
     },
   };
 }
@@ -55,7 +64,17 @@ export default function QuestPage({ params }: QuestPageProps) {
     "@type": "EntertainmentBusiness",
     name: `NOX — ${quest.title}`,
     description: quest.plot,
-    image: quest.cover,
+    // Абсолютный URL: относительный путь в schema.org невалиден — Google его отбрасывает
+    image: `${SITE_URL}${quest.cover}`,
+    url: `${SITE_URL}/quests/${quest.slug}`,
+    telephone: CONTACTS.phoneDisplay,
+    // Точный адрес квест-рум выдаёт после подтверждения брони:
+    // в разметке только город и страна (Google допускает частичный адрес).
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: CONTACTS.city,
+      addressCountry: "RU",
+    },
   };
 
   // BreadcrumbList: структура реальна — на странице есть ссылка «← Все квесты»
@@ -84,7 +103,10 @@ export default function QuestPage({ params }: QuestPageProps) {
   };
 
   return (
-    <main className="mx-auto max-w-3xl px-6 pb-28 pt-[calc(7rem+env(safe-area-inset-top))] md:pt-36">
+    <main
+      id="main"
+      className="mx-auto max-w-3xl px-6 pb-28 pt-[calc(7rem+env(safe-area-inset-top))] md:pt-36"
+    >
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

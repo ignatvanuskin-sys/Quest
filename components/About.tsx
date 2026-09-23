@@ -1,5 +1,3 @@
-"use client";
-
 import Image from "next/image";
 import Reveal from "@/components/Reveal";
 import { QUESTS } from "@/lib/quests";
@@ -63,8 +61,15 @@ export default function About() {
         />
       </div>
 
+      {/* Настоящий h2: раньше здесь был <p>, и у секции не было заголовка —
+          после h1 из Hero сразу шёл h3 в карточках статистики, что нарушает
+          порядок заголовков (WCAG 1.3.1). Визуально это тот же мелкий капс:
+          font-body снимает дисплейную гарнитуру, которую базовый слой
+          навешивает на h1–h4. */}
       <Reveal>
-        <p className="tracking-caps text-[11px] text-muted">О НАС</p>
+        <h2 className="tracking-caps font-body text-[11px] font-normal text-muted">
+          О НАС
+        </h2>
       </Reveal>
 
       <div className="mt-8 space-y-8">

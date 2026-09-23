@@ -32,6 +32,14 @@ export default function QuestModal({ quest, onClose }: QuestModalProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLElement | null>(null);
 
+  // onClose — в ref: при смене идентичности функции (родитель пересоздаёт её
+  // на каждом рендере) эффект ниже перезапускался бы, на миг снимая
+  // блокировку скролла и возвращая фокус на карточку-триггер.
+  const onCloseRef = useRef(onClose);
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  });
+
   useFocusTrap(panelRef, true);
 
   // Esc + блокировка фонового скролла + перенос фокуса в диалог
@@ -40,7 +48,7 @@ export default function QuestModal({ quest, onClose }: QuestModalProps) {
     triggerRef.current = document.activeElement as HTMLElement;
 
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") onCloseRef.current();
     };
     window.addEventListener("keydown", onKey);
     document.documentElement.style.overflow = "hidden";
@@ -60,7 +68,7 @@ export default function QuestModal({ quest, onClose }: QuestModalProps) {
       // Восстанавливаем фокус на триггер
       triggerRef.current?.focus();
     };
-  }, [onClose]);
+  }, []);
 
   const bookThis = () => {
     preselectQuest(quest.slug);

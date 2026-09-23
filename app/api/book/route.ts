@@ -3,6 +3,7 @@ import { bookingSchema } from "@/lib/validation";
 import { sendTelegramMessage } from "@/lib/telegram";
 import { getQuestBySlug } from "@/lib/quests";
 import { rateLimit } from "@/lib/rate-limit";
+import { VIDEO_RECORD_PRICE } from "@/lib/site";
 
 /** Человекочитаемые подписи уровня страха */
 const SCARE_LABELS: Record<string, string> = {
@@ -80,7 +81,9 @@ export async function POST(req: Request) {
     data.scareLevel
       ? `Уровень страха: ${SCARE_LABELS[data.scareLevel] ?? data.scareLevel}`
       : null,
-    data.videoRecord ? "Видеозапись прохождения: да (+1 500 ₽)" : null,
+    data.videoRecord
+      ? `Видеозапись прохождения: да (+${VIDEO_RECORD_PRICE})`
+      : null,
     `Стоимость (примерно): от ${quest.priceFrom.toLocaleString("ru-RU")} ₽`,
     `Комментарий: ${data.comment || "—"}`,
     `Отправлено: ${when} (МСК)`,

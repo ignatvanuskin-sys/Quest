@@ -1,7 +1,6 @@
 import type { MetadataRoute } from "next";
 import { QUESTS } from "@/lib/quests";
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://qwest-scary.vercel.app";
+import { SITE_URL } from "@/lib/site";
 
 /**
  * Стабильная дата последнего изменения контента. Не new Date() — иначе каждый

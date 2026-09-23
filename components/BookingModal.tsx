@@ -27,6 +27,16 @@ export default function BookingModal({ open, onClose }: BookingModalProps) {
   const closeRef = useRef<HTMLButtonElement>(null);
   const triggerRef = useRef<HTMLElement | null>(null);
 
+  // onClose держим в ref. Если родитель передаёт новую функцию на каждый
+  // рендер, эффект ниже перезапускается: его cleanup успевает снять
+  // блокировку скролла и вернуть фокус, а потом всё ставится заново —
+  // страница мигала «разблокировано», фокус прыгал на крестик.
+  // Обновляем ref в отдельном эффекте (объявлен раньше — выполнится первым).
+  const onCloseRef = useRef(onClose);
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  });
+
   useFocusTrap(panelRef, open);
 
   // Esc + блокировка скролла + остановка Lenis + управление фокусом
@@ -35,7 +45,7 @@ export default function BookingModal({ open, onClose }: BookingModalProps) {
     triggerRef.current = document.activeElement as HTMLElement;
 
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") onCloseRef.current();
     };
     window.addEventListener("keydown", onKey);
     document.documentElement.style.overflow = "hidden";
@@ -55,7 +65,7 @@ export default function BookingModal({ open, onClose }: BookingModalProps) {
       window.dispatchEvent(new Event(LENIS_START_EVENT));
       triggerRef.current?.focus();
     };
-  }, [open, onClose, reduced]);
+  }, [open, reduced]);
 
   return (
     <AnimatePresence>

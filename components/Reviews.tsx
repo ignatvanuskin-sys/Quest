@@ -1,5 +1,3 @@
-"use client";
-
 import Reveal from "@/components/Reveal";
 import { REVIEWS, REVIEWS_AVG } from "@/lib/reviews";
 import { QUESTS } from "@/lib/quests";
