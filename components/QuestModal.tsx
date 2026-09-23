@@ -79,17 +79,23 @@ export default function QuestModal({ quest, onClose }: QuestModalProps) {
       aria-label={`Квест «${quest.title}»`}
     >
       {/* Бэкдроп */}
-      <motion.button
-        type="button"
-        aria-label="Закрыть"
-        className="absolute inset-0 h-full w-full cursor-default touch-none bg-bg/80 backdrop-blur-sm"
+      {/* Анимация opacity — на обёртке, а не на размытом слое: элемент с
+          backdrop-filter при анимации opacity пересобирает размытие каждый
+          кадр (на телефоне это мерцание «бликов» за стеклом). */}
+      <motion.div
+        className="absolute inset-0"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: reduced ? 0.15 : 0.35 }}
-        onClick={onClose}
-        tabIndex={-1}
-      />
+      >
+        <button
+          type="button"
+          aria-label="Закрыть"
+          className="h-full w-full cursor-default touch-none bg-bg/80 backdrop-blur-sm"
+          onClick={onClose}
+        />
+      </motion.div>
 
       {/* Панель — shared layout с карточкой.
           overflow-hidden + скролл во внутреннем блоке: hero с крестиком

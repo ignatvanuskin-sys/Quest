@@ -77,18 +77,26 @@ export default function BookingModal({ open, onClose }: BookingModalProps) {
           aria-label="Бронирование квеста"
         >
           {/* Бэкдроп. touch-none: жест по бэкдропу не должен прокручивать фон
-              (на iOS overflow:hidden на <html> сам по себе этого не гарантирует) */}
-          <motion.button
-            type="button"
-            aria-label="Закрыть"
-            tabIndex={-1}
-            className="absolute inset-0 h-full w-full cursor-default touch-none bg-bg/80 backdrop-blur-sm"
+              (на iOS overflow:hidden на <html> сам по себе этого не гарантирует).
+
+              Анимация opacity живёт на обёртке, а не на самом размытом слое:
+              если анимировать элемент с backdrop-filter, браузер пересобирает
+              размытие каждый кадр — на телефоне это заметное мерцание. */}
+          <motion.div
+            className="absolute inset-0"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: reduced ? 0.15 : 0.3 }}
-            onClick={onClose}
-          />
+          >
+            <button
+              type="button"
+              aria-label="Закрыть"
+              tabIndex={-1}
+              className="h-full w-full cursor-default touch-none bg-bg/80 backdrop-blur-sm"
+              onClick={onClose}
+            />
+          </motion.div>
 
           {/* Панель: на мобильном — с отступом от краёв и ограничением высоты
               (раньше растягивалась на весь экран), на десктопе — компактная карточка.

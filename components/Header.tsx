@@ -100,10 +100,20 @@ export default function Header() {
           смыкались (замер: зазор лого→CTA = 0), а бургер прижимался к краю.
           До 360 px сужаем боковые отступы и кнопку. */}
       <header
-        className={`fixed inset-x-0 top-0 z-[70] flex items-center justify-between px-4 pb-4 pt-[max(1rem,env(safe-area-inset-top))] transition-colors duration-500 min-[360px]:px-5 md:px-10 md:pb-6 md:pt-[max(1.5rem,env(safe-area-inset-top))] ${
-          scrolled
-            ? "border-b border-line bg-bg/85 backdrop-blur-md"
-            : "border-b border-transparent bg-transparent"
+        /* При открытом меню шапка НЕ рисует собственную подложку: раньше её
+           `bg-bg/85 + backdrop-blur-md` ложился поверх такого же размытого слоя
+           меню и на экране появлялась светлая полоса с жёсткой границей по
+           border-b («блик» поперёк верха экрана). */
+        className={`fixed inset-x-0 top-0 z-[70] flex items-center justify-between px-4 pb-4 pt-[max(1rem,env(safe-area-inset-top))] min-[360px]:px-5 md:px-10 md:pb-6 md:pt-[max(1.5rem,env(safe-area-inset-top))] ${
+          open
+            ? // Переход отключаем: иначе подложка и линия угасают 500 мс уже
+              // поверх меню и читаются как «полоса», ползущая по верху экрана
+              "border-b border-transparent bg-transparent"
+            : `transition-colors duration-500 ${
+                scrolled
+                  ? "border-b border-line bg-bg/85 backdrop-blur-md"
+                  : "border-b border-transparent bg-transparent"
+              }`
         }`}
       >
         <button
@@ -157,13 +167,20 @@ export default function Header() {
 
       <AnimatePresence>
         {open && (
+          /* Почему меню НЕПРОЗРАЧНОЕ и без backdrop-blur.
+             Раньше слой был `bg-bg/95 backdrop-blur-md` и появлялся анимацией
+             opacity: за ним просвечивало hero-видео и WebGL-канвас, а размытие
+             пересчитывалось на каждом кадре — на телефоне это читалось как
+             мерцание меню и «блики» (яркие пятна, ползущие за стеклом).
+             Теперь подложка сплошная и появляется сразу (`initial={false}`),
+             а анимируется только содержимое — оно без фильтров и стоит дёшево. */
           <motion.div
             key="menu"
-            initial={{ opacity: 0 }}
+            initial={false}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: reduced ? 0.15 : 0.4 }}
-            className="fixed inset-0 z-[60] overflow-y-auto bg-bg/95 backdrop-blur-md"
+            transition={{ duration: reduced ? 0.15 : 0.25 }}
+            className="fixed inset-0 z-[60] overflow-y-auto overscroll-contain bg-bg"
             role="dialog"
             aria-modal="true"
             aria-label="Основное меню"
