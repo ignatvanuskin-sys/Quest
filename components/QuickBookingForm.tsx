@@ -8,22 +8,13 @@ import { useBookingForm } from "@/lib/useBookingForm";
 import { PLAYERS_MAX, todayLocalISO } from "@/lib/validation";
 import DarkSelect from "@/components/DarkSelect";
 
-// Инпуты 16px на мобильных — Safari не зумит форму при фокусе (input zoom)
-// Поля в стиле карточки (bg-bg-alt), без кровавых акцентов.
-const field =
-  "min-h-[46px] w-full appearance-none rounded-none border border-line bg-bg-alt text-opacity-90 text-[16px] text-fg placeholder:text-muted transition-colors duration-300 focus:border-fg/40 focus:outline-none md:text-[14px]";
-const selectField =
-  "bg-bg-alt text-[16px] text-fg focus:border-fg/40 focus:outline-none md:text-[14px]";
-const selectPlaceholder = "text-muted md:text-[14px]";
-const selectValue = "text-fg";
-
-const optionStyle =
-  "hover:bg-fg/10 focus:bg-fg/10 text-[14px] transition-colors focus:outline-none border border-transparent px-3.5 py-2.5 text-left cursor-pointer";
-const selected = "text-fg bg-fg/10";
-const neutral = "text-fg/85";
-
-const label = "mb-1.5 block text-[11px] tracking-caps text-muted";
-const error = "mt-1 text-[11px] text-fg/70";
+// Стили полей — общие классы из styles/globals.css (.field-input,
+// .field-label, .field-error). Так все поля на сайте выглядят одинаково:
+// 46px высота, отступ px-3.5, одинаковые hover/focus/invalid.
+// 16px на мобильных — Safari не зумит форму при фокусе (input zoom).
+const field = "field-input";
+const label = "field-label";
+const error = "field-error";
 
 /** id ошибки для aria-describedby */
 const errId = (name: string) => `q-${name}-error`;
@@ -224,7 +215,7 @@ export default function QuickBookingForm({ onClose }: { onClose?: () => void }) 
                   min={minDate || undefined}
                   aria-invalid={!!errors.date}
                   aria-describedby={errors.date ? errId("date") : undefined}
-                  className={`${field} [color-scheme:dark]`}
+                  className={field}
                   {...register("date")}
                 />
                 {errors.date?.message && (
@@ -260,7 +251,7 @@ export default function QuickBookingForm({ onClose }: { onClose?: () => void }) 
               <label htmlFor="q-players" className={label}>
                 Игроков
               </label>
-              <div className="flex items-stretch border border-line">
+              <div className="flex items-stretch border border-line bg-bg-alt">
                 <button
                   type="button"
                   aria-label="Уменьшить количество игроков"
@@ -273,7 +264,7 @@ export default function QuickBookingForm({ onClose }: { onClose?: () => void }) 
                 <output
                   id="q-players"
                   aria-live="polite"
-                  className="flex flex-1 items-center justify-center text-[14px] text-fg"
+                  className="flex flex-1 items-center justify-center border-x border-line text-[14px] text-fg"
                 >
                   {players}
                 </output>
@@ -298,7 +289,7 @@ export default function QuickBookingForm({ onClose }: { onClose?: () => void }) 
             <div>
               <label
                 htmlFor="q-videoRecord"
-                className="flex min-h-[44px] cursor-pointer items-start gap-2.5 text-[11px] leading-relaxed text-muted"
+                className="flex min-h-[44px] cursor-pointer items-start gap-3 text-[12px] leading-relaxed text-muted transition-colors hover:text-fg"
               >
                 <input
                   id="q-videoRecord"
@@ -330,7 +321,7 @@ export default function QuickBookingForm({ onClose }: { onClose?: () => void }) 
             <div>
               <label
                 htmlFor="q-agree"
-                className="flex min-h-[44px] cursor-pointer items-start gap-2.5 text-[11px] leading-relaxed text-muted"
+                className="flex min-h-[44px] cursor-pointer items-start gap-3 text-[12px] leading-relaxed text-muted transition-colors hover:text-fg"
               >
                 <input
                   id="q-agree"
@@ -373,7 +364,7 @@ export default function QuickBookingForm({ onClose }: { onClose?: () => void }) 
             <button
               type="submit"
               disabled={status === "loading"}
-              className="btn-primary w-full disabled:cursor-wait disabled:opacity-60"
+              className="btn-primary mt-1 min-h-[48px] w-full disabled:cursor-wait disabled:opacity-60"
             >
               {status === "loading"
                 ? "Отправляем…"

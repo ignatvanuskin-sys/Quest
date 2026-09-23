@@ -111,9 +111,12 @@ body {
 
   /* Чекбокс: явный checked-стейт с галочкой + видимый фокус (keyboard) */
   .checkbox {
-    @apply h-4 w-4 shrink-0 cursor-pointer appearance-none border border-line bg-bg-alt transition-colors duration-200;
+    @apply h-[18px] w-[18px] shrink-0 cursor-pointer appearance-none border border-line bg-bg-alt transition-colors duration-200;
     background-position: center;
     background-repeat: no-repeat;
+  }
+  .checkbox:hover:not(:checked) {
+    border-color: rgba(236, 231, 223, 0.4);
   }
   .checkbox:checked {
     @apply border-accent-bright bg-accent;
@@ -233,6 +236,71 @@ body {
   }
   .chip[data-active="true"] {
     @apply border-accent-bright bg-accent text-fg;
+  }
+
+  /* ============ Поля форм — единый вид во всех формах ============
+     Раньше у текстовых инпутов вообще не было горизонтального отступа:
+     текст упирался в рамку, а селект рядом имел px-3.5 — поля выглядели
+     разнокалиберными. Здесь всё сведено к одному набору:
+     46px высота (тач-таргет), px-3.5, hover/focus/invalid-состояния. */
+  .field-input {
+    @apply w-full appearance-none rounded-none border border-line bg-bg-alt px-3.5 text-[16px] text-fg transition-colors duration-200 focus:outline-none md:text-[14px];
+    min-height: 46px;
+  }
+  .field-input::placeholder {
+    color: rgb(var(--muted));
+    opacity: 1;
+  }
+  .field-input:hover:not(:disabled):not(:focus) {
+    border-color: rgba(236, 231, 223, 0.28);
+  }
+  .field-input:focus {
+    border-color: rgba(236, 231, 223, 0.5);
+    background-color: rgb(var(--bg));
+  }
+  .field-input:disabled {
+    opacity: 0.45;
+  }
+  .field-input[aria-invalid="true"] {
+    border-color: rgb(var(--accent-bright));
+  }
+  /* Нативный индикатор календаря: на тёмной теме он почти не виден */
+  .field-input[type="date"] {
+    color-scheme: dark;
+  }
+  .field-input[type="date"]::-webkit-calendar-picker-indicator {
+    opacity: 0.45;
+    cursor: pointer;
+  }
+  .field-input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 0.9;
+  }
+
+  /* Подпись поля */
+  .field-label {
+    @apply tracking-caps mb-1.5 block text-[11px] text-muted;
+  }
+  /* Сообщение об ошибке под полем */
+  .field-error {
+    @apply mt-1 text-[11px] leading-relaxed;
+    color: var(--accent-text);
+  }
+
+  /* Триггер выпадающего списка — та же геометрия, что у .field-input */
+  .field-trigger {
+    @apply flex w-full items-center justify-between gap-3 rounded-none border border-line bg-bg-alt px-3.5 text-left text-[16px] transition-colors duration-200 focus:outline-none md:text-[14px];
+    min-height: 46px;
+  }
+  .field-trigger:hover {
+    border-color: rgba(236, 231, 223, 0.28);
+  }
+  .field-trigger[data-open="true"],
+  .field-trigger:focus {
+    border-color: rgba(236, 231, 223, 0.5);
+    background-color: rgb(var(--bg));
+  }
+  .field-trigger[aria-invalid="true"] {
+    border-color: rgb(var(--accent-bright));
   }
 }
 
@@ -462,16 +530,17 @@ body {
   }
 }
 
-/* Горизонтальные карусели — нативный snap-скролл без видимого скроллбара */
 /* Горизонтальная карусель каталога (мобильный).
-   Здесь СОЗНАТЕЛЬНО нет ни scroll-snap-type, ни touch-action — оба проверены
-   замером настоящими touch-событиями и оба ломали вертикальный жест:
-   с ними палец на карточке не мог прокрутить страницу вниз (0px вместо 225px).
-   Ряд при этом листается вбок свободно. Индикатор «N / всего» работает
-   по событию scroll и от снапа не зависит.
-   touch-action по умолчанию (auto) разрешает и панорамирование, и зум. */
+   Здесь СОЗНАТЕЛЬНО ничего, кроме самого скролла:
+   - нет scroll-snap-type и touch-action — на вложенном скроллере они
+     перехватывают жест (проверено замером);
+   - нет -webkit-overflow-scrolling: touch — свойство устаревшее, на iOS
+     превращает элемент в «ловушку» и обрывает передачу жеста родителю:
+     палец на карточке не прокручивал страницу вниз. В Chrome свойство
+     игнорируется, поэтому в эмуляции баг не воспроизводился — он жил
+     только на реальном iPhone. iOS 13+ и Android дают инерционный
+     скролл нативно, свойство не нужно. */
 .snap-row {
-  -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
 .snap-row::-webkit-scrollbar {

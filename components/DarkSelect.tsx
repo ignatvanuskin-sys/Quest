@@ -88,6 +88,7 @@ export default function DarkSelect({
         aria-invalid={invalid}
         aria-describedby={describedBy}
         data-field={name}
+        data-open={open}
         onClick={() => setOpen((v) => !v)}
         onKeyDown={(e) => {
           if (e.key === "ArrowDown" || e.key === "Enter" || e.key === " ") {
@@ -95,9 +96,7 @@ export default function DarkSelect({
             setOpen(true);
           }
         }}
-        className={`flex min-h-[46px] w-full items-center justify-between gap-3 rounded-none border bg-bg-alt px-3.5 py-2.5 text-left text-[16px] transition-colors duration-300 focus:border-fg/40 focus:outline-none md:text-[14px] ${
-          picked ? "border-line text-fg" : "border-line text-muted"
-        } ${open ? "border-fg/40" : ""}`}
+        className={`field-trigger ${picked ? "text-fg" : "text-muted"}`}
       >
         <span className="truncate">{picked ? picked.label : placeholder}</span>
         <svg

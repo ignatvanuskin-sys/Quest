@@ -36,6 +36,11 @@ function Skulls({ level }: { level: number }) {
  * Карточка квеста в каталоге.
  * Hover: scale 1.02 + усиление тени (десктоп); tap: scale 0.98 (мобильный).
  * layoutId связывает карточку с полноэкранной модалкой (shared transition).
+ *
+ * ВАЖНО: у карточки нет overflow-hidden. Обложка обрезается своим
+ * внутренним контейнером (aspect-[4/5] overflow-hidden), а лишний
+ * скролл-контейнер на iOS рискует перехватывать touch-жест — из-за этого
+ * палец на карточке не прокручивал страницу.
  */
 export default function QuestCard({ quest, onOpen, index = 0 }: QuestCardProps) {
   const reduced = useReducedMotion();
@@ -53,7 +58,7 @@ export default function QuestCard({ quest, onOpen, index = 0 }: QuestCardProps) 
         delay: reduced ? 0 : Math.min(index * 0.08, 0.4),
         ease: [0.22, 1, 0.36, 1],
       }}
-      className="panel group relative flex w-[82vw] max-w-[360px] shrink-0 flex-col overflow-hidden md:w-full md:max-w-none"
+      className="panel group relative flex w-[82vw] max-w-[360px] shrink-0 flex-col md:w-full md:max-w-none"
     >
       {/* Обложка. Клик по ней открывает детали — крупный touch-target;
           кнопка «Подробнее» ниже остаётся отдельным интерактивом (без вложенных

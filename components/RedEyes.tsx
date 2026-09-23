@@ -4,6 +4,11 @@
  * появление/моргание задаются keyframes (см. .red-eyes в globals.css).
  * При prefers-reduced-motion глаза скрыты (opacity гасится CSS).
  * Доступность: aria-hidden, в поток фокуса не попадают.
+ *
+ * z-index отрицательный: элемент позиционированный, а значит по правилам
+ * наложения рисуется ВЫШЕ фонов неспозиционированных соседей — из-за этого
+ * глаза просвечивали сквозь форму и налезали на подписи полей. Родитель
+ * обязан создавать контекст наложения (isolate), иначе -z-10 уедет под фон.
  */
 
 const eyes: Array<{
@@ -23,7 +28,7 @@ const eyes: Array<{
 export default function RedEyes() {
   return (
     <div
-      className="pointer-events-none absolute inset-0 overflow-hidden"
+      className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
       aria-hidden="true"
     >
       {eyes.map((e, i) => (

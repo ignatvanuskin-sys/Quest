@@ -61,7 +61,7 @@ export default function BookingModal({ open, onClose }: BookingModalProps) {
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-[80] flex items-stretch justify-center md:items-center md:p-8"
+          className="fixed inset-0 z-[80] flex items-center justify-center p-3 md:p-8"
           role="dialog"
           aria-modal="true"
           aria-label="Бронирование квеста"
@@ -79,25 +79,26 @@ export default function BookingModal({ open, onClose }: BookingModalProps) {
             onClick={onClose}
           />
 
-          {/* Панель: мобильный — весь экран, десктоп — центрированная карточка */}
+          {/* Панель: на мобильном — с отступом от краёв и ограничением высоты
+              (раньше растягивалась на весь экран), на десктопе — компактная карточка */}
           <motion.div
             ref={panelRef}
             initial={{ opacity: 0, y: reduced ? 0 : 32 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: reduced ? 0 : 24 }}
             transition={{ duration: reduced ? 0.2 : 0.45, ease: [0.22, 1, 0.36, 1] }}
-            className="panel relative z-10 flex w-full flex-col overflow-y-auto overscroll-contain md:max-h-[92vh] md:max-w-xl"
+            className="panel isolate relative z-10 flex max-h-[calc(100dvh-1.5rem)] w-full flex-col overflow-y-auto overscroll-contain md:max-h-[88vh] md:max-w-lg"
           >
             {/* Пугающие красные глаза, выглядывающие из тьмы (фон диалога) */}
             <RedEyes />
 
             {/* Шапка диалога. safe-area сверху — на iPhone с «челкой»
-                диалог полноэкранный, кнопка закрытия не должна уезжать под вырез. */}
-            <div className="relative overflow-visible border-b border-line px-5 pb-6 pt-[calc(1.5rem+env(safe-area-inset-top))] md:px-7 md:pt-6">
+                кнопка закрытия не должна уезжать под вырез. */}
+            <div className="relative overflow-visible border-b border-line px-5 pb-4 pt-[calc(1.25rem+env(safe-area-inset-top))] md:px-6 md:pt-5">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="tracking-caps text-[11px] text-muted">ЗАПИСЬ НА ИГРУ</p>
-                  <p className="mt-1 font-display text-2xl leading-tight text-fg">
+                  <p className="mt-1 font-display text-xl leading-tight text-fg">
                     Забронировать квест
                   </p>
                 </div>
@@ -125,8 +126,11 @@ export default function BookingModal({ open, onClose }: BookingModalProps) {
               </div>
             </div>
 
-            {/* Форма записи */}
-            <div className="bg-bg-alt/40 px-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] pt-5 md:px-7 md:py-6">
+            {/* Форма записи. Фон непрозрачный (bg-bg), а не bg-bg-alt/40:
+                при полупрозрачном фоне декоративные «глаза» просвечивали
+                сквозь форму и налезали на подписи полей. Теперь они видны
+                только в шапке диалога — там, где и задуманы. */}
+            <div className="bg-bg px-5 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-4 md:px-6 md:py-5">
               <QuickBookingForm onClose={onClose} />
             </div>
           </motion.div>
