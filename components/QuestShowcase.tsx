@@ -106,14 +106,24 @@ export default function QuestShowcase({ onOpen }: QuestShowcaseProps) {
   const touchY = useRef<number | null>(null);
 
   const onTouchStart = (e: ReactTouchEvent<HTMLDivElement>) => {
-    touchX.current = e.touches[0].clientX;
-    touchY.current = e.touches[0].clientY;
+    // Список точек может быть пустым (touchcancel, синтетические события
+    // инструментов разработчика) — без проверки здесь падал TypeError.
+    const point = e.touches[0];
+    if (!point) return;
+    touchX.current = point.clientX;
+    touchY.current = point.clientY;
   };
 
   const onTouchEnd = (e: ReactTouchEvent<HTMLDivElement>) => {
     if (touchX.current == null || touchY.current == null) return;
-    const dx = e.changedTouches[0].clientX - touchX.current;
-    const dy = e.changedTouches[0].clientY - touchY.current;
+    const point = e.changedTouches[0];
+    if (!point) {
+      touchX.current = null;
+      touchY.current = null;
+      return;
+    }
+    const dx = point.clientX - touchX.current;
+    const dy = point.clientY - touchY.current;
     touchX.current = null;
     touchY.current = null;
     if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.4) {
@@ -123,7 +133,11 @@ export default function QuestShowcase({ onOpen }: QuestShowcaseProps) {
 
   return (
     <div
-      className="relative flex min-h-[540px] flex-col overflow-hidden border border-line bg-bg-alt md:min-h-[560px]"
+      // min-height привязан к высоте вьюпорта: в ландшафте телефона экран
+      // высотой ~390 px, и жёсткие 560 px «этажа» витрины туда не помещались
+      // (замер: витрина 560 px при vh 390). min(…, 80dvh) оставляет прежние
+      // 540/560 px на нормальных экранах и ужимает витрину на низких.
+      className="relative flex min-h-[min(540px,80dvh)] flex-col overflow-hidden border border-line bg-bg-alt md:min-h-[min(560px,80dvh)]"
       data-showcase-paused={paused ? "true" : "false"}
       /* Пауза по наведению — только для мыши. На тач-устройстве pointerenter
          срабатывает при касании, а pointerleave может не прийти (палец ушёл

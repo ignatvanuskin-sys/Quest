@@ -2,6 +2,12 @@ import type { Config } from "tailwindcss";
 
 const config: Config = {
   content: ["./app/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}"],
+  // hover-утилиты оборачиваются в @media (hover: hover): на тач-устройствах
+  // :hover «залипает» после тапа (кнопка остаётся подсвеченной). В v4 это
+  // поведение по умолчанию, здесь включаем флагом.
+  future: {
+    hoverOnlyWhenSupported: true,
+  },
   theme: {
     extend: {
       colors: {

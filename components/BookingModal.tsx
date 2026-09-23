@@ -5,7 +5,8 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import QuickBookingForm from "@/components/QuickBookingForm";
 import RedEyes from "@/components/RedEyes";
 import { useFocusTrap } from "@/lib/useFocusTrap";
-import { LENIS_STOP_EVENT, LENIS_START_EVENT } from "@/lib/scroll";
+import { useScrollLock } from "@/lib/scroll-lock";
+import { useOverlayHistory } from "@/lib/overlay-history";
 
 interface BookingModalProps {
   open: boolean;
@@ -38,8 +39,12 @@ export default function BookingModal({ open, onClose }: BookingModalProps) {
   });
 
   useFocusTrap(panelRef, open);
+  // Блокировка прокрутки фона (счётная — см. lib/scroll-lock)
+  useScrollLock(open);
+  // Системное «Назад» закрывает диалог, а не уводит со страницы
+  useOverlayHistory(open, onClose);
 
-  // Esc + блокировка скролла + остановка Lenis + управление фокусом
+  // Esc + управление фокусом
   useEffect(() => {
     if (!open) return;
     triggerRef.current = document.activeElement as HTMLElement;
@@ -48,9 +53,6 @@ export default function BookingModal({ open, onClose }: BookingModalProps) {
       if (e.key === "Escape") onCloseRef.current();
     };
     window.addEventListener("keydown", onKey);
-    document.documentElement.style.overflow = "hidden";
-    // Останавливаем Lenis, чтобы колесо мыши не скроллило страницу под модалкой
-    window.dispatchEvent(new Event(LENIS_STOP_EVENT));
     const focusTimer = window.setTimeout(
       () => {
         closeRef.current?.focus();
@@ -61,8 +63,6 @@ export default function BookingModal({ open, onClose }: BookingModalProps) {
     return () => {
       window.removeEventListener("keydown", onKey);
       window.clearTimeout(focusTimer);
-      document.documentElement.style.overflow = "";
-      window.dispatchEvent(new Event(LENIS_START_EVENT));
       triggerRef.current?.focus();
     };
   }, [open, reduced]);
@@ -76,12 +76,13 @@ export default function BookingModal({ open, onClose }: BookingModalProps) {
           aria-modal="true"
           aria-label="Бронирование квеста"
         >
-          {/* Бэкдроп */}
+          {/* Бэкдроп. touch-none: жест по бэкдропу не должен прокручивать фон
+              (на iOS overflow:hidden на <html> сам по себе этого не гарантирует) */}
           <motion.button
             type="button"
             aria-label="Закрыть"
             tabIndex={-1}
-            className="absolute inset-0 h-full w-full cursor-default bg-bg/80 backdrop-blur-sm"
+            className="absolute inset-0 h-full w-full cursor-default touch-none bg-bg/80 backdrop-blur-sm"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -90,21 +91,27 @@ export default function BookingModal({ open, onClose }: BookingModalProps) {
           />
 
           {/* Панель: на мобильном — с отступом от краёв и ограничением высоты
-              (раньше растягивалась на весь экран), на десктопе — компактная карточка */}
+              (раньше растягивалась на весь экран), на десктопе — компактная карточка.
+
+              overflow-hidden + отдельный скроллящийся блок ниже: шапка с
+              крестиком должна быть доступна ВСЕГДА. Раньше панель скроллилась
+              целиком, и на низких экранах (320×568, ландшафт) кнопка закрытия
+              уезжала за верх кадра на −236 px — выйти из формы можно было,
+              только прокрутив панель обратно. */}
           <motion.div
             ref={panelRef}
             initial={{ opacity: 0, y: reduced ? 0 : 32 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: reduced ? 0 : 24 }}
             transition={{ duration: reduced ? 0.2 : 0.45, ease: [0.22, 1, 0.36, 1] }}
-            className="panel isolate relative z-10 flex max-h-[calc(100dvh-1.5rem)] w-full flex-col overflow-y-auto overscroll-contain md:max-h-[88vh] md:max-w-lg"
+            className="panel relative isolate z-10 flex max-h-[calc(100dvh-1.5rem)] w-full flex-col overflow-hidden md:max-h-[88vh] md:max-w-lg"
           >
             {/* Пугающие красные глаза, выглядывающие из тьмы (фон диалога) */}
             <RedEyes />
 
-            {/* Шапка диалога. safe-area сверху — на iPhone с «челкой»
-                кнопка закрытия не должна уезжать под вырез. */}
-            <div className="relative overflow-visible border-b border-line px-5 pb-4 pt-[calc(1.25rem+env(safe-area-inset-top))] md:px-6 md:pt-5">
+            {/* Шапка диалога не скроллится. safe-area сверху — на iPhone
+                с «челкой» кнопка закрытия не должна уезжать под вырез. */}
+            <div className="relative z-20 shrink-0 border-b border-line px-5 pb-4 pt-[calc(1.25rem+env(safe-area-inset-top))] md:px-6 md:pt-5">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="tracking-caps text-[11px] text-muted">ЗАПИСЬ НА ИГРУ</p>
@@ -140,7 +147,9 @@ export default function BookingModal({ open, onClose }: BookingModalProps) {
                 при полупрозрачном фоне декоративные «глаза» просвечивали
                 сквозь форму и налезали на подписи полей. Теперь они видны
                 только в шапке диалога — там, где и задуманы. */}
-            <div className="bg-bg px-5 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-4 md:px-6 md:py-5">
+            {/* Единственный скроллящийся блок диалога (min-h-0 обязателен:
+                без него flex-элемент не даёт себя сжать) */}
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-bg px-5 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-4 md:px-6 md:py-5">
               <QuickBookingForm onClose={onClose} />
             </div>
           </motion.div>

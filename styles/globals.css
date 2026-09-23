@@ -53,6 +53,15 @@ body {
   color: rgb(var(--fg));
 }
 
+/* Отступ при переходе по анкору (#quests, #safety и т.п.).
+   Нужен нативному пути скролла (lib/scroll.ts → scrollIntoView): фиксированная
+   шапка ~72px иначе накрывает заголовок секции. Lenis использует тот же
+   отступ параметром offset. */
+section[id],
+main[id] {
+  scroll-margin-top: 72px;
+}
+
 /* Тонкий скроллбар в стиле сайта */
 ::-webkit-scrollbar {
   width: 10px;
@@ -98,15 +107,33 @@ body {
   .btn {
     @apply tracking-caps inline-flex min-h-[44px] items-center justify-center gap-2 px-7 py-3 text-[13px] font-semibold transition-all duration-300 ease-cinematic;
   }
+  /* ВАЖНО про hover: всё, что реагирует на наведение, живёт внутри
+     @media (hover: hover). На тач-устройствах :hover «залипает» после тапа
+     и элемент остаётся подсвеченным до следующего нажатия. Вместо hover у
+     тач-пользователя — :active (мгновенный отклик на нажатие), потому что
+     -webkit-tap-highlight-color глобально отключён преflight'ом Tailwind:
+     без :active и без подсветки тап не давал вообще никакой отдачи. */
   .btn-primary {
-    @apply btn bg-accent text-fg hover:bg-accent-bright;
+    @apply btn bg-accent text-fg;
   }
   .btn-ghost {
     @apply btn border border-line text-fg;
   }
-  .btn-ghost:hover {
-    border-color: rgba(236, 231, 223, 0.4);
-    background-color: rgba(236, 231, 223, 0.05);
+  .btn-primary:active {
+    background-color: rgb(var(--accent-bright));
+  }
+  .btn-ghost:active {
+    background-color: rgba(236, 231, 223, 0.12);
+    border-color: rgba(236, 231, 223, 0.5);
+  }
+  @media (hover: hover) {
+    .btn-primary:hover {
+      background-color: rgb(var(--accent-bright));
+    }
+    .btn-ghost:hover {
+      border-color: rgba(236, 231, 223, 0.4);
+      background-color: rgba(236, 231, 223, 0.05);
+    }
   }
 
   /* Чекбокс: явный checked-стейт с галочкой + видимый фокус (keyboard) */
@@ -115,8 +142,10 @@ body {
     background-position: center;
     background-repeat: no-repeat;
   }
-  .checkbox:hover:not(:checked) {
-    border-color: rgba(236, 231, 223, 0.4);
+  @media (hover: hover) {
+    .checkbox:hover:not(:checked) {
+      border-color: rgba(236, 231, 223, 0.4);
+    }
   }
   .checkbox:checked {
     @apply border-accent-bright bg-accent;
@@ -127,8 +156,15 @@ body {
     outline-offset: 2px;
   }
 
-  /* Below-the-fold секции: браузер пропускает layout/paint вне вьюпорта.
-     Экономия на длинных страницах с тяжёлыми карточками. */
+  /* Below-the-fold блоки: браузер пропускает layout/paint вне вьюпорта.
+     Экономия на длинных страницах с тяжёлыми карточками.
+
+     ИСПОЛЬЗОВАТЬ ТОЛЬКО ТАМ, ГДЕ ВЫСОТА НЕ ЗАВИСИТ ОТ КОНТЕНТА (например
+     SmokeHeartBand с h-[58vh]). Пока элемент не отрисован, браузер берёт
+     высоту из contain-intrinsic-size (800px), и если реальная высота другая,
+     страница «дорастает» прямо во время скролла. Мобильный замер: #reviews
+     1024 → 2803 px (+1778), из-за чего якорь «Безопасность» промахивался
+     на 1851 px. Поэтому у секций с контентной высотой класс снят. */
   .below-fold {
     content-visibility: auto;
     contain-intrinsic-size: auto 800px;
@@ -166,13 +202,20 @@ body {
 
   /* Фильтр-чип */
   .chip {
-    @apply tracking-caps inline-flex min-h-[44px] items-center border border-line px-5 text-[12px] text-muted transition-all duration-300 ease-cinematic hover:text-fg;
+    @apply tracking-caps inline-flex min-h-[44px] items-center border border-line px-5 text-[12px] text-muted transition-all duration-300 ease-cinematic;
   }
-  .chip:hover {
-    border-color: rgba(236, 231, 223, 0.4);
+  .chip:active {
+    color: rgb(var(--fg));
+    border-color: rgba(236, 231, 223, 0.5);
   }
   .chip[data-active="true"] {
     @apply border-accent-bright bg-accent text-fg;
+  }
+  @media (hover: hover) {
+    .chip:hover {
+      border-color: rgba(236, 231, 223, 0.4);
+      color: rgb(var(--fg));
+    }
   }
 
   /* ============ Поля форм — единый вид во всех формах ============
@@ -188,8 +231,10 @@ body {
     color: rgb(var(--fg-muted));
     opacity: 1;
   }
-  .field-input:hover:not(:disabled):not(:focus) {
-    border-color: rgba(236, 231, 223, 0.28);
+  @media (hover: hover) {
+    .field-input:hover:not(:disabled):not(:focus) {
+      border-color: rgba(236, 231, 223, 0.28);
+    }
   }
   .field-input:focus {
     border-color: rgba(236, 231, 223, 0.5);
@@ -209,13 +254,18 @@ body {
     opacity: 0.45;
     cursor: pointer;
   }
-  .field-input[type="date"]::-webkit-calendar-picker-indicator:hover {
-    opacity: 0.9;
+  @media (hover: hover) {
+    .field-input[type="date"]::-webkit-calendar-picker-indicator:hover {
+      opacity: 0.9;
+    }
   }
 
-  /* Подпись поля */
+  /* Подпись поля.
+     Кликабельна (label for=…), поэтому высота ≥ 24 px — минимум WCAG 2.5.8
+     для указателей. Замер до правки: 324×17 px. Заодно 12 px на мобильных
+     вместо 11 px — читаемость мелкого капса на телефоне. */
   .field-label {
-    @apply tracking-caps mb-1.5 block text-[11px] text-muted;
+    @apply tracking-caps mb-1.5 flex min-h-[24px] items-center text-[12px] text-muted md:text-[11px];
   }
   /* Сообщение об ошибке под полем */
   .field-error {
@@ -228,8 +278,13 @@ body {
     @apply flex w-full items-center justify-between gap-3 rounded-none border border-line bg-bg-alt px-3.5 text-left text-[16px] transition-colors duration-200 focus:outline-none md:text-[14px];
     min-height: 46px;
   }
-  .field-trigger:hover {
+  .field-trigger:active {
     border-color: rgba(236, 231, 223, 0.28);
+  }
+  @media (hover: hover) {
+    .field-trigger:hover {
+      border-color: rgba(236, 231, 223, 0.28);
+    }
   }
   .field-trigger[data-open="true"],
   .field-trigger:focus {
@@ -536,6 +591,51 @@ body.has-custom-cursor button {
   }
   20% {
     transform: scaleY(0.06);
+  }
+}
+
+/* ============ Мобильные состояния ============ */
+
+/* touch-action: manipulation убирает задержку 300 мс и «двойной тап-зум» на
+   кнопках и ссылках. Прокрутка и pinch-zoom остаются разрешены
+   (manipulation = pan-x pan-y pinch-zoom), поэтому карусели не ломаются. */
+@layer base {
+  a,
+  button,
+  input,
+  select,
+  textarea,
+  label,
+  summary,
+  [role="button"],
+  [role="tab"],
+  [role="option"] {
+    touch-action: manipulation;
+  }
+}
+
+/* Пока открыт оверлей: гасим scroll-chaining и «отскок» (rubber-band) на iOS,
+   из-за которых жест по бэкдропу утаскивал фон под модалкой. Само скрытие
+   прокрутки ставит lib/scroll-lock (инлайн overflow:hidden + класс). */
+html.scroll-locked,
+html.scroll-locked body {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+/* Ландшафт телефона: вьюпорт высотой ~390 px, но Tailwind `md:` (768px)
+   уже включён, и в такой экран приезжает планшетная вертикальная раскладка —
+   витрина высотой 560 px и секционные отступы 144 px. Замер до правки:
+   витрина 560 при vh 390, паддинг секции отзывов 144 px. */
+@media (orientation: landscape) and (max-height: 560px) {
+  #quests,
+  #reviews,
+  #safety,
+  #about,
+  #steps,
+  #contacts {
+    padding-top: 3.5rem;
+    padding-bottom: 3.5rem;
   }
 }
 

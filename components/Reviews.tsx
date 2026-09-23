@@ -71,15 +71,24 @@ function Stars({ value }: { value: number }) {
  */
 export default function Reviews() {
   return (
-    <section id="reviews" className="below-fold py-28 md:py-36" aria-label="Отзывы">
+    // `below-fold` (content-visibility: auto) убран сознательно: высота секции
+    // зависит от контента, и до первого рендера браузер подставлял заглушку
+    // 800 px вместо ~2800 px — страница «дорастала» на 1778 px во время
+    // скролла, ломая позицию чтения и якорную навигацию.
+    <section id="reviews" className="py-28 md:py-36" aria-label="Отзывы">
       <div className="mx-auto max-w-6xl px-6">
         <Reveal>
           <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
             <div>
               <p className="tracking-caps text-[11px] text-muted">ГОЛОСА ВЫЖИВШИХ</p>
               <h2 className="mt-4 font-display text-4xl text-fg md:text-5xl">Отзывы</h2>
+              {/* Формулировка намеренно не утверждает, что отзывы проверены:
+                  данные в lib/reviews.ts помечены как DEMO/PLACEHOLDER, и
+                  заявление «реальные игроки» / «прошедшие комнаты» было бы
+                  недостоверным (риск по ФЗ «О рекламе» и правилам Google).
+                  Тексты можно вернуть только вместе с настоящими отзывами. */}
               <p className="mt-3 max-w-md text-sm leading-relaxed text-muted">
-                Реальные игроки NOX о том, что чувствовали, пока длился час страха.
+                Что рассказывают после прохождения комнат NOX.
               </p>
             </div>
 
@@ -188,9 +197,10 @@ export default function Reviews() {
         })}
       </div>
 
-      <p className="tracking-caps mx-auto mt-8 max-w-6xl px-6 text-[11px] text-muted">
-        Все отзывы — от гостей, реально прошедших комнаты
-      </p>
+      {/* Здесь была строка «Все отзывы — от гостей, реально прошедших комнаты».
+          Данные в lib/reviews.ts — демонстрационные плейсхолдеры, поэтому
+          утверждение о проверенности отзывов снято. Возвращать его можно
+          только вместе с реальной выгрузкой отзывов. */}
     </section>
   );
 }

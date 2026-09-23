@@ -7,12 +7,9 @@ import type { Quest } from "@/lib/quests";
 import QuestArt from "@/components/QuestArt";
 import QuestDetailsBody from "@/components/QuestDetailsBody";
 import { useFocusTrap } from "@/lib/useFocusTrap";
-import {
-  openBookingMenu,
-  preselectQuest,
-  LENIS_STOP_EVENT,
-  LENIS_START_EVENT,
-} from "@/lib/scroll";
+import { useScrollLock } from "@/lib/scroll-lock";
+import { useOverlayHistory } from "@/lib/overlay-history";
+import { openBookingMenu, preselectQuest } from "@/lib/scroll";
 
 interface QuestModalProps {
   quest: Quest;
@@ -41,8 +38,12 @@ export default function QuestModal({ quest, onClose }: QuestModalProps) {
   });
 
   useFocusTrap(panelRef, true);
+  // Блокировка прокрутки фона (счётная — см. lib/scroll-lock)
+  useScrollLock(true);
+  // Системное «Назад» закрывает детали квеста, а не уводит со страницы
+  useOverlayHistory(true, onClose);
 
-  // Esc + блокировка фонового скролла + перенос фокуса в диалог
+  // Esc + перенос фокуса в диалог
   useEffect(() => {
     // Запоминаем элемент, который открыл модалку — вернём фокус при закрытии
     triggerRef.current = document.activeElement as HTMLElement;
@@ -51,10 +52,6 @@ export default function QuestModal({ quest, onClose }: QuestModalProps) {
       if (e.key === "Escape") onCloseRef.current();
     };
     window.addEventListener("keydown", onKey);
-    document.documentElement.style.overflow = "hidden";
-    // Останавливаем Lenis, иначе колесо мыши (smoothWheel) перехватывает
-    // скролл и крутит страницу под модалкой, а не содержимое диалога.
-    window.dispatchEvent(new Event(LENIS_STOP_EVENT));
     // Небольшая задержка чтобы фокус сработал после mount-анимации
     const focusTimer = window.setTimeout(() => {
       closeRef.current?.focus();
@@ -62,8 +59,6 @@ export default function QuestModal({ quest, onClose }: QuestModalProps) {
 
     return () => {
       window.removeEventListener("keydown", onKey);
-      document.documentElement.style.overflow = "";
-      window.dispatchEvent(new Event(LENIS_START_EVENT));
       window.clearTimeout(focusTimer);
       // Восстанавливаем фокус на триггер
       triggerRef.current?.focus();
@@ -87,7 +82,7 @@ export default function QuestModal({ quest, onClose }: QuestModalProps) {
       <motion.button
         type="button"
         aria-label="Закрыть"
-        className="absolute inset-0 h-full w-full cursor-default bg-bg/80 backdrop-blur-sm"
+        className="absolute inset-0 h-full w-full cursor-default touch-none bg-bg/80 backdrop-blur-sm"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -96,14 +91,17 @@ export default function QuestModal({ quest, onClose }: QuestModalProps) {
         tabIndex={-1}
       />
 
-      {/* Панель — shared layout с карточкой */}
+      {/* Панель — shared layout с карточкой.
+          overflow-hidden + скролл во внутреннем блоке: hero с крестиком
+          остаётся на месте, а прокручиваются только детали. Раньше панель
+          скроллилась целиком и на 320×568 крестик уезжал за верх кадра. */}
       <motion.div
         ref={panelRef}
         layoutId={`quest-${quest.slug}`}
         transition={{ duration: reduced ? 0.2 : 0.55, ease: [0.22, 1, 0.36, 1] }}
-        className="panel relative z-10 flex max-h-full w-full max-w-3xl flex-col overflow-y-auto overscroll-contain pb-[env(safe-area-inset-bottom)]"
+        className="panel relative z-10 flex max-h-full w-full max-w-3xl flex-col overflow-hidden"
       >
-        {/* Hero модалки */}
+        {/* Hero модалки — фиксированная шапка панели (не скроллится) */}
         <div className="relative h-56 shrink-0 overflow-hidden md:h-72">
           <QuestArt
             seed={quest.art.cover}
@@ -150,24 +148,28 @@ export default function QuestModal({ quest, onClose }: QuestModalProps) {
           </div>
         </div>
 
-        <QuestDetailsBody
-          quest={quest}
-          headingAs="h4"
-          cta={
-            <div className="space-y-3">
-              <button type="button" onClick={bookThis} className="btn-primary w-full">
-                Забронировать эту комнату
-              </button>
-              <Link
-                href={`/quests/${quest.slug}`}
-                className="btn-ghost w-full text-[11px]"
-                onClick={onClose}
-              >
-                Полная страница квеста
-              </Link>
-            </div>
-          }
-        />
+        {/* Единственный скроллящийся блок диалога (min-h-0 обязателен:
+            без него flex-элемент не даёт себя сжать) */}
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pb-[env(safe-area-inset-bottom)]">
+          <QuestDetailsBody
+            quest={quest}
+            headingAs="h4"
+            cta={
+              <div className="space-y-3">
+                <button type="button" onClick={bookThis} className="btn-primary w-full">
+                  Забронировать эту комнату
+                </button>
+                <Link
+                  href={`/quests/${quest.slug}`}
+                  className="btn-ghost w-full text-[11px]"
+                  onClick={onClose}
+                >
+                  Полная страница квеста
+                </Link>
+              </div>
+            }
+          />
+        </div>
       </motion.div>
     </motion.div>
   );

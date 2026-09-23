@@ -46,7 +46,11 @@ export default function LenisProvider() {
       const id = (e as CustomEvent<string>).detail;
       const el = document.getElementById(id);
       if (!el) return;
-      lenis.scrollTo(el, { offset: -72, duration: 1.4 });
+      // offset НЕ передаём: Lenis сам вычитает `scroll-margin-top` цели
+      // (см. его scrollTo → parseFloat(targetStyle.scrollMarginTop)).
+      // Раньше здесь стоял offset: -72, и отступ вычитался дважды — цель
+      // останавливалась на 144 px вместо 72 px.
+      lenis.scrollTo(el, { duration: 1.4 });
     };
     const onStop = () => lenis.stop();
     const onStart = () => lenis.start();

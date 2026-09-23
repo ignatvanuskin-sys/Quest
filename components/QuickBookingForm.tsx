@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { QUESTS, TIME_SLOTS } from "@/lib/quests";
 import { useBookingForm } from "@/lib/useBookingForm";
-import { PLAYERS_MAX, todayLocalISO } from "@/lib/validation";
+import { maxBookableISO, todayBusinessISO } from "@/lib/validation";
 import { VIDEO_RECORD_PRICE } from "@/lib/site";
 import DarkSelect from "@/components/DarkSelect";
 
@@ -30,7 +30,12 @@ export default function QuickBookingForm({ onClose }: { onClose?: () => void }) 
     register,
     errors,
     status,
+    serverError,
+    demoDelivered,
     players,
+    playersMin,
+    playersMax,
+    selectedQuest,
     phoneValue,
     questValue,
     timeValue,
@@ -59,9 +64,15 @@ export default function QuickBookingForm({ onClose }: { onClose?: () => void }) 
 
   // min для date-инпута — только после монтирования (hydration-safe:
   // сервер и первый клиентский рендер совпадают, значение подставляется эффектом)
+  // Границы date-инпута: считаются по МСК, как и валидация на сервере
+  // (расписание комнат живёт по московскому времени — см. lib/contacts.ts → hours),
+  // а не по локальной зоне браузера. Пустая строка до монтирования, чтобы SSR
+  // и первый клиентский рендер совпадали (hydration-safe).
   const [minDate, setMinDate] = useState<string>("");
+  const [maxDate, setMaxDate] = useState<string>("");
   useEffect(() => {
-    setMinDate(todayLocalISO());
+    setMinDate(todayBusinessISO());
+    setMaxDate(maxBookableISO());
   }, []);
 
   return (
@@ -90,9 +101,20 @@ export default function QuickBookingForm({ onClose }: { onClose?: () => void }) 
               </svg>
             </span>
             <div>
-              <p className="font-display text-2xl text-fg">Заявка получена.</p>
+              {/* Демо-режим: заявка не ушла (Telegram не подключён), поэтому
+                  обещать звонок нельзя — текст экрана успеха другой. */}
+              {demoDelivered && (
+                <span className="tracking-caps mb-2 inline-block border border-accent-bright/50 bg-accent/10 px-3 py-1 text-[11px] text-accent-text">
+                  Демо-режим
+                </span>
+              )}
+              <p className="font-display text-2xl text-fg">
+                {demoDelivered ? "Заявка не отправлена" : "Заявка получена."}
+              </p>
               <p className="mt-2 max-w-xs text-[13px] leading-relaxed text-muted">
-                Перезвоним в течение 15 минут, чтобы подтвердить бронь.
+                {demoDelivered
+                  ? "Это демонстрационный шаблон: Telegram-бот не подключён, поэтому заявка никуда не ушла. Форма, валидация и проверки работают по-настоящему."
+                  : "Перезвоним в течение 15 минут, чтобы подтвердить бронь."}
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -205,7 +227,10 @@ export default function QuickBookingForm({ onClose }: { onClose?: () => void }) 
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            {/* До 360 px «Дата» и «Время» стоят в одну колонку: в две колонки
+                поле даты сжималось до 121 px и нативное «ДД.ММ.ГГГГ» с иконкой
+                календаря обрезалось. */}
+            <div className="grid grid-cols-1 gap-3 min-[360px]:grid-cols-2">
               <div>
                 <label htmlFor="q-date" className={label}>
                   Дата
@@ -214,6 +239,7 @@ export default function QuickBookingForm({ onClose }: { onClose?: () => void }) 
                   id="q-date"
                   type="date"
                   min={minDate || undefined}
+                  max={maxDate || undefined}
                   aria-invalid={!!errors.date}
                   aria-describedby={errors.date ? errId("date") : undefined}
                   className={field}
@@ -256,7 +282,7 @@ export default function QuickBookingForm({ onClose }: { onClose?: () => void }) 
                 <button
                   type="button"
                   aria-label="Уменьшить количество игроков"
-                  disabled={players <= 1}
+                  disabled={players <= playersMin}
                   onClick={() => setPlayers(players - 1)}
                   className="min-h-[46px] w-[48px] text-lg text-fg transition-colors hover:bg-fg/5 disabled:opacity-30"
                 >
@@ -276,13 +302,20 @@ export default function QuickBookingForm({ onClose }: { onClose?: () => void }) 
                 <button
                   type="button"
                   aria-label="Увеличить количество игроков"
-                  disabled={players >= PLAYERS_MAX}
+                  disabled={players >= playersMax}
                   onClick={() => setPlayers(players + 1)}
                   className="min-h-[46px] w-[48px] text-lg text-fg transition-colors hover:bg-fg/5 disabled:opacity-30"
                 >
                   +
                 </button>
               </div>
+              {/* Диапазон вместимости выбранной комнаты — чтобы гость не пытался
+                  записаться составом больше, чем вмещает зал */}
+              <p className="mt-1 text-[11px] leading-relaxed text-muted">
+                {selectedQuest
+                  ? `«${selectedQuest.title}»: ${playersMin}–${playersMax} игроков`
+                  : `От ${playersMin} до ${playersMax} игроков`}
+              </p>
               {errors.players?.message && (
                 <p id={errId("players")} className={error} role="alert">
                   {errors.players.message}
@@ -362,7 +395,8 @@ export default function QuickBookingForm({ onClose }: { onClose?: () => void }) 
                 className="border border-fg/30 bg-fg/5 px-3 py-2 text-[12px] text-fg"
                 role="alert"
               >
-                Не удалось отправить. Проверьте соединение и попробуйте снова.
+                {serverError ??
+                  "Не удалось отправить. Проверьте соединение и попробуйте снова."}
               </p>
             )}
 

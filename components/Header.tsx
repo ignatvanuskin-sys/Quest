@@ -6,10 +6,11 @@ import {
   scrollToId,
   openBookingMenu,
   OPEN_BOOKING_EVENT,
-  LENIS_STOP_EVENT,
-  LENIS_START_EVENT,
 } from "@/lib/scroll";
 import BookingModal from "@/components/BookingModal";
+import { useFocusTrap } from "@/lib/useFocusTrap";
+import { useScrollLock } from "@/lib/scroll-lock";
+import { useOverlayHistory } from "@/lib/overlay-history";
 
 const NAV = [
   { id: "quests", label: "Квесты" },
@@ -30,17 +31,16 @@ export default function Header() {
   const burgerRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Блокируем скролл под любым оверлеем (меню или бронирование)
-  // и останавливаем Lenis, чтобы колесо мыши не скроллило страницу.
-  useEffect(() => {
-    const anyOverlay = open || bookingOpen;
-    document.documentElement.style.overflow = anyOverlay ? "hidden" : "";
-    window.dispatchEvent(new Event(anyOverlay ? LENIS_STOP_EVENT : LENIS_START_EVENT));
-    return () => {
-      document.documentElement.style.overflow = "";
-      window.dispatchEvent(new Event(LENIS_START_EVENT));
-    };
-  }, [open, bookingOpen]);
+  // Меню блокирует скролл страницы и накрывает её целиком, поэтому ведёт себя
+  // как модальный диалог: фокус не должен уходить на невидимый контент под
+  // оверлеем. Без этого Tab уводил клавиатуру на скрытые кнопки страницы.
+  useFocusTrap(menuRef, open);
+
+  // Блокировка скролла и история «Назад» для бургер-меню.
+  // Диалог брони регистрирует себя сам (BookingModal) — иначе на один
+  // диалог приходилось бы две записи истории и лишнее нажатие «Назад».
+  useScrollLock(open);
+  useOverlayHistory(open, () => setOpen(false));
 
   // Esc закрывает меню (бронирование закрывает свой Esc внутри BookingModal)
   useEffect(() => {
@@ -96,8 +96,11 @@ export default function Header() {
 
   return (
     <>
+      {/* На 320 px шапке нужно ≈332 px при боковых отступах 20 px: логотип и CTA
+          смыкались (замер: зазор лого→CTA = 0), а бургер прижимался к краю.
+          До 360 px сужаем боковые отступы и кнопку. */}
       <header
-        className={`fixed inset-x-0 top-0 z-[70] flex items-center justify-between px-5 pb-4 pt-[max(1rem,env(safe-area-inset-top))] transition-colors duration-500 md:px-10 md:pb-6 md:pt-[max(1.5rem,env(safe-area-inset-top))] ${
+        className={`fixed inset-x-0 top-0 z-[70] flex items-center justify-between px-4 pb-4 pt-[max(1rem,env(safe-area-inset-top))] transition-colors duration-500 min-[360px]:px-5 md:px-10 md:pb-6 md:pt-[max(1.5rem,env(safe-area-inset-top))] ${
           scrolled
             ? "border-b border-line bg-bg/85 backdrop-blur-md"
             : "border-b border-transparent bg-transparent"
@@ -124,7 +127,7 @@ export default function Header() {
             onClick={() => setBookingOpen(true)}
             aria-hidden={open}
             tabIndex={open ? -1 : 0}
-            className={`btn-primary min-h-[44px] px-4 py-2 text-[11px] transition-opacity duration-300 sm:px-5 ${
+            className={`btn-primary min-h-[44px] px-3.5 py-2 text-[10px] transition-opacity duration-300 min-[360px]:px-4 min-[360px]:text-[11px] sm:px-5 ${
               open ? "pointer-events-none opacity-0" : ""
             }`}
           >
@@ -154,13 +157,15 @@ export default function Header() {
 
       <AnimatePresence>
         {open && (
-          <motion.nav
+          <motion.div
             key="menu"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: reduced ? 0.15 : 0.4 }}
             className="fixed inset-0 z-[60] overflow-y-auto bg-bg/95 backdrop-blur-md"
+            role="dialog"
+            aria-modal="true"
             aria-label="Основное меню"
           >
             <div
@@ -178,33 +183,35 @@ export default function Header() {
                   НАВИГАЦИЯ
                 </motion.p>
 
-                <ul className="mt-5 space-y-1">
-                  {NAV.map((item, i) => (
-                    <motion.li
-                      key={item.id}
-                      initial={{ opacity: 0, y: reduced ? 0 : 24 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{
-                        delay: reduced ? 0 : 0.1 + i * 0.06,
-                        duration: 0.5,
-                        ease: [0.22, 1, 0.36, 1],
-                      }}
-                    >
-                      <button
-                        type="button"
-                        onClick={() => go(item.id)}
-                        className="group flex min-h-[52px] items-baseline gap-4 py-1 text-left"
+                <nav aria-label="Разделы сайта">
+                  <ul className="mt-5 space-y-1">
+                    {NAV.map((item, i) => (
+                      <motion.li
+                        key={item.id}
+                        initial={{ opacity: 0, y: reduced ? 0 : 24 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{
+                          delay: reduced ? 0 : 0.1 + i * 0.06,
+                          duration: 0.5,
+                          ease: [0.22, 1, 0.36, 1],
+                        }}
                       >
-                        <span className="tracking-caps text-[11px] text-muted transition-colors group-hover:text-accent-text">
-                          0{i + 1}
-                        </span>
-                        <span className="font-display text-3xl text-fg transition-colors group-hover:text-accent-text md:text-4xl">
-                          {item.label}
-                        </span>
-                      </button>
-                    </motion.li>
-                  ))}
-                </ul>
+                        <button
+                          type="button"
+                          onClick={() => go(item.id)}
+                          className="group flex min-h-[52px] items-baseline gap-4 py-1 text-left"
+                        >
+                          <span className="tracking-caps text-[11px] text-muted transition-colors group-hover:text-accent-text">
+                            0{i + 1}
+                          </span>
+                          <span className="font-display text-3xl text-fg transition-colors group-hover:text-accent-text md:text-4xl">
+                            {item.label}
+                          </span>
+                        </button>
+                      </motion.li>
+                    ))}
+                  </ul>
+                </nav>
 
                 {/* CTA записи — крупная, отдельная от навигации */}
                 <motion.button
@@ -235,7 +242,7 @@ export default function Header() {
                 </motion.p>
               </div>
             </div>
-          </motion.nav>
+          </motion.div>
         )}
       </AnimatePresence>
 
