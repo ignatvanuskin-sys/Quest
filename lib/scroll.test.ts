@@ -100,12 +100,14 @@ describe("scrollToId", () => {
     scrollToId("safety");
     expect(element.scrollIntoView).toHaveBeenCalledTimes(1);
 
+    // Задержка коррекции больше анимации Lenis (1.4 с), иначе проверка
+    // застаёт прокрутку в пути и запускает вторую поверх первой.
     top = 1923; // страница «доросла», цель сместилась вниз
-    vi.advanceTimersByTime(900);
+    vi.advanceTimersByTime(1700);
     expect(element.scrollIntoView).toHaveBeenCalledTimes(2);
 
     top = 72; // после повторной прокрутки цель на месте
-    vi.advanceTimersByTime(900);
+    vi.advanceTimersByTime(1700);
     expect(element.scrollIntoView).toHaveBeenCalledTimes(2);
 
     vi.useRealTimers();
@@ -118,9 +120,9 @@ describe("scrollToId", () => {
     const { scrollToId } = await loadModule();
 
     scrollToId("safety");
-    vi.advanceTimersByTime(900);
-    vi.advanceTimersByTime(900);
-    vi.advanceTimersByTime(900);
+    vi.advanceTimersByTime(1700);
+    vi.advanceTimersByTime(1700);
+    vi.advanceTimersByTime(1700);
     expect(element.scrollIntoView).toHaveBeenCalledTimes(3); // 1 + 2 коррекции
 
     vi.useRealTimers();
