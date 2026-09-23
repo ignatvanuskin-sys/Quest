@@ -12,7 +12,7 @@ export default function Loading() {
     >
       <span className="sr-only">Загрузка…</span>
       <div
-        className="flicker-soft text-fg/40 font-display text-4xl tracking-[0.18em]"
+        className="flicker-soft font-display text-4xl tracking-[0.18em] text-fg/40"
         aria-hidden="true"
       >
         NOX

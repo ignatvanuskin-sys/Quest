@@ -8,6 +8,12 @@ const securityHeaders = [
     value: "camera=(), microphone=(), geolocation=(), interest-cohort=()",
   },
   { key: "X-DNS-Prefetch-Control", value: "on" },
+  // Сайт работает только по HTTPS (Vercel). HSTS закрывает downgrade-атаки
+  // и запрещает браузеру ходить на http-версию домена.
+  {
+    key: "Strict-Transport-Security",
+    value: "max-age=63072000; includeSubDomains; preload",
+  },
   {
     key: "Content-Security-Policy",
     value: [

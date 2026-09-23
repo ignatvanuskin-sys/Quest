@@ -41,6 +41,13 @@ jobs:
       - name: Format check
         run: npm run format:check
 
+      # Информационно: у next@14.2.x есть открытые advisory, закрытые только
+      # в 15.5.26+/16.x (мажорный апгрейд, отдельная задача). Не блокируем CI,
+      # чтобы не маскировать регрессы под шумом известных проблем.
+      - name: Dependency audit (informational)
+        run: npm audit --omit=dev
+        continue-on-error: true
+
       - name: Build
         run: npm run build
         env:

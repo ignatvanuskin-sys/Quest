@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -11,7 +11,11 @@ import {
   type BookingData,
 } from "@/lib/validation";
 import { QUESTS } from "@/lib/quests";
-import { PRESELECT_EVENT, readPreselectedQuest } from "@/lib/scroll";
+import {
+  PRESELECT_EVENT,
+  readPreselectedQuest,
+  clearPreselectedQuest,
+} from "@/lib/scroll";
 
 export type BookingStatus = "idle" | "loading" | "success" | "error";
 
@@ -23,6 +27,14 @@ export type BookingStatus = "idle" | "loading" | "success" | "error";
  */
 export function useBookingForm() {
   const [status, setStatus] = useState<BookingStatus>("idle");
+  /** Текст ошибки, пришедший с сервера (rate-limit, недоступный Telegram и т.п.) */
+  const [serverError, setServerError] = useState<string | null>(null);
+  /**
+   * Демо-режим: сервер принял заявку, но Telegram не подключён и она никуда
+   * не отправлена (`{ok:true, demo:true}`). Экран успеха в этом случае другой —
+   * нельзя показывать «Перезвоним в течение 15 минут» там, где никто не позвонит.
+   */
+  const [demoDelivered, setDemoDelivered] = useState(false);
 
   const {
     register,
@@ -58,6 +70,31 @@ export function useBookingForm() {
   const timeValue = watch("time");
   const scareValue = watch("scareLevel") ?? "standard";
 
+  /**
+   * Вместимость выбранной комнаты. Общий предел схемы (1..12) не знает о зале:
+   * «Дом Ворона» — 2–5 человек. Степпер обязан упираться в лимит комнаты,
+   * иначе гость отправляет заявку на 12 игроков в комнату на 5.
+   * Пока квест не выбран — действует общий предел.
+   */
+  const selectedQuest = useMemo(
+    () => QUESTS.find((q) => q.slug === questValue) ?? null,
+    [questValue]
+  );
+  const playersMin = selectedQuest?.playersMin ?? PLAYERS_MIN;
+  const playersMax = selectedQuest?.playersMax ?? PLAYERS_MAX;
+
+  const playersRef = useRef(players);
+  playersRef.current = players;
+
+  // Смена квеста подтягивает количество игроков в диапазон новой комнаты
+  useEffect(() => {
+    const quest = QUESTS.find((q) => q.slug === questValue);
+    if (!quest) return;
+    const current = playersRef.current;
+    const clamped = Math.min(quest.playersMax, Math.max(quest.playersMin, current));
+    if (clamped !== current) setValue("players", clamped, { shouldValidate: true });
+  }, [questValue, setValue]);
+
   // Предзаполнение квеста: CustomEvent (если форма уже смонтирована),
   // сохранённый slug (preselectQuest вызван до открытия диалога) или ?quest=slug
   useEffect(() => {
@@ -68,11 +105,14 @@ export function useBookingForm() {
     };
     window.addEventListener(PRESELECT_EVENT, onPreselect);
 
-    // Подхват сохранённого предвыбора (формы не было в DOM при диспатче)
+    // Подхват сохранённого предвыбора (формы не было в DOM при диспатче).
+    // Значение одноразовое: применили — очистили, иначе оно «прилипало»
+    // ко всем следующим открытиям формы до перезагрузки страницы.
     const pending = readPreselectedQuest();
     if (pending && QUESTS.some((q) => q.slug === pending)) {
       setValue("quest", pending, { shouldValidate: true });
     }
+    clearPreselectedQuest();
 
     const fromUrl = new URLSearchParams(window.location.search).get("quest");
     if (fromUrl && QUESTS.some((q) => q.slug === fromUrl)) {
@@ -103,22 +143,60 @@ export function useBookingForm() {
 
   const onSubmit = handleSubmit(async (data) => {
     setStatus("loading");
+    setServerError(null);
+    setDemoDelivered(false);
     try {
       const res = await fetch("/api/book", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (!res.ok) {
+        // Сервер объясняет причину человеческим языком (429 — лимит,
+        // 503 — приём заявок выключен, 422 — правило комнаты).
+        // Показываем именно её вместо безликого «проверьте соединение».
+        let message: string | null = null;
+        try {
+          const payload: unknown = await res.json();
+          if (
+            payload &&
+            typeof payload === "object" &&
+            typeof (payload as { error?: unknown }).error === "string"
+          ) {
+            message = (payload as { error: string }).error;
+          }
+        } catch {
+          /* тело не JSON — остаёмся с общей формулировкой */
+        }
+        setServerError(message);
+        setStatus("error");
+        return;
+      }
+      // Читаем тело даже при успехе: сервер помечает демо-режим флагом demo.
+      // Разбор не должен ломать успех — при любой проблеме считаем режим живым.
+      try {
+        const payload: unknown = await res.json();
+        setDemoDelivered(
+          Boolean(
+            payload &&
+            typeof payload === "object" &&
+            (payload as { demo?: unknown }).demo === true
+          )
+        );
+      } catch {
+        setDemoDelivered(false);
+      }
       setStatus("success");
     } catch {
+      // Сеть/обрыв: сообщение сервера недоступно
+      setServerError(null);
       setStatus("error");
     }
   }, onInvalid);
 
-  /** Степпер игроков с ограничением PLAYERS_MIN..PLAYERS_MAX */
+  /** Степпер игроков с ограничением вместимости выбранной комнаты */
   const setPlayers = (next: number) =>
-    setValue("players", Math.min(PLAYERS_MAX, Math.max(PLAYERS_MIN, next)), {
+    setValue("players", Math.min(playersMax, Math.max(playersMin, next)), {
       shouldValidate: true,
     });
 
@@ -146,6 +224,8 @@ export function useBookingForm() {
 
   const submitAnother = () => {
     reset();
+    setServerError(null);
+    setDemoDelivered(false);
     setStatus("idle");
   };
 
@@ -153,7 +233,12 @@ export function useBookingForm() {
     register,
     errors,
     status,
+    serverError,
+    demoDelivered,
     players,
+    playersMin,
+    playersMax,
+    selectedQuest,
     phoneValue,
     questValue,
     timeValue,
